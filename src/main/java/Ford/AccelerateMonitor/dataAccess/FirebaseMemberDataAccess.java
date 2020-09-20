@@ -20,7 +20,7 @@ public class FirebaseMemberDataAccess implements MemberInterface {
     @Autowired
     public FirebaseMemberDataAccess() throws IOException {
         FileInputStream serviceAccount =
-                new FileInputStream(".\\ford-501d7-firebase-adminsdk-svb09-9d40c15937.json");
+                new FileInputStream("ford-501d7-firebase-adminsdk-svb09-9d40c15937.json");
         //
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
