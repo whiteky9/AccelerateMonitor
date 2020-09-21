@@ -12,12 +12,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+//Data access class for experimental or testing purposes
 @Repository("trialDataAccess")
 public class FirebaseTrialMemberDataAccess implements MemberInterface {
 
     @Autowired
     public FirebaseTrialMemberDataAccess() throws IOException {
+        //creates connection to database
         FileInputStream serviceAccount =
                 new FileInputStream("auth\\ford-501d7-firebase-adminsdk-svb09-9d40c15937.json");
 
@@ -25,58 +28,58 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .setDatabaseUrl("https://ford-501d7.firebaseio.com/")
                 .build();
-
+        //instantiates firebase app
         this.app = FirebaseApp.initializeApp(options, "FirebaseTrialDatabase");
     }
 
+    //
+    // adds a member into the database
+    //
     @Override
     public int insertMember(Member member){
+        //creates reference to member list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference dataRef = DB.getReference();
         DatabaseReference membersRef = dataRef.child("members");
 
+        //pushes provided member into the database
         DatabaseReference newMemberRef = membersRef.push();
         newMemberRef.setValueAsync(member);
 
         return 0;
     }
 
+    //
+    // gets a list of all members from the database
+    //
     @Override
     public List<Member> getAllMembers(){
+        //creates reference to member list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference getMembersRef = DB.getReference("members");
         List<Member> members = new ArrayList<>();
 
-        getMembersRef.addChildEventListener(new ChildEventListener() {
+        getMembersRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Member member = dataSnapshot.getValue(Member.class);
-                members.add(member);
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    members.add(child.getValue(Member.class));
+                }
+                System.out.println(members.size() + "i");
             }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
+
+        //waits for listeners to update members
+        while(members.size()==0){}
         return members;
     }
 
-    private FirebaseApp app;
+    final private FirebaseApp app;
 
 }
