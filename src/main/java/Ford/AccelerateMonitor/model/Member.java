@@ -11,9 +11,9 @@ public class Member {
     }
 
     public Member(){
-        this.id= 0;
-        this.name="k";
-        this.role="b";
+        this.id= null;
+        this.name=null;
+        this.role=null;
     }
 
     public String getName() {

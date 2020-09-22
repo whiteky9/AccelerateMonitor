@@ -30,11 +30,13 @@ public class MemberController {
         return memberService.getAllMembers();
     }
 
+    @GetMapping(path = "{id}")
+    public Member getMember(@PathVariable("id") int id){ return memberService.getMember(id); }
 
-/*    @PostMapping
-    public String createMember(@RequestBody Member member ) throws InterruptedException, ExecutionException {
-        return memberService.saveMemberDetails(member);
-    }*/
+    @DeleteMapping(path = "{id}")
+    public void deleteMember(@PathVariable("id") int id){ memberService.deleteMember(id); }
+
+
 
 /*
     @PutMapping("/updateMember")
@@ -42,9 +44,6 @@ public class MemberController {
         return memberService.updateMemberDetails(member);
     }
 
-    @DeleteMapping("/deleteMember")
-    public String deleteMember(@RequestParam String name){
-        return memberService.deleteMember(name);
-    }
+
 */
 }

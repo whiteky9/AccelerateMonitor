@@ -10,10 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Map;
 
 //Data Access class for final version of database
 @Repository("DataAccess")
@@ -78,6 +80,88 @@ public class FirebaseMemberDataAccess implements MemberInterface {
         //waits for listeners to update members
         while(members.size()==0){}
         return members;
+    }
+    //
+    // gets member by id
+    //
+    @Override
+    public Member getMember(int id){
+        //creates reference to member list in database
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
+        DatabaseReference getMemberRef = DB.getReference("members");
+        List<Member> members = new ArrayList<>();
+
+        getMemberRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                members.add(dataSnapshot.getValue(Member.class));
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(members.size()==0){}
+        return members.get(0);
+    }
+
+    //
+    // removes member from database
+    //
+    @Override
+    public void deleteMember(int id){
+        //creates reference to member list in database
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
+        DatabaseReference membersRef = DB.getReference("members");
+        Map<String, Object> deleteUserById = new HashMap<>();
+        List<String> keys = new ArrayList<>();
+        //
+        membersRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                keys.add(dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        //
+        while(keys.size()==0){}
+        deleteUserById.put(keys.get(0), null);
+        membersRef.updateChildrenAsync(deleteUserById);
     }
 
     final private FirebaseApp app;

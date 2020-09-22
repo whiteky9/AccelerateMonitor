@@ -18,14 +18,14 @@ public class MemberService {
     @Autowired
     public MemberService(@Qualifier("trialDataAccess") MemberInterface memberInterface){ this.memberInterface = memberInterface; }
 
-
-    public int addMember(Member member){
-        return memberInterface.insertMember(member);
-
-    }
+    public int addMember(Member member){ return memberInterface.insertMember(member); }
 
     public List<Member> getAllMembers(){
         return memberInterface.getAllMembers();
     }
+
+    public Member getMember(int id) { return memberInterface.getMember(id); }
+
+    public void deleteMember(int id){ memberInterface.deleteMember(id); }
 
 }
