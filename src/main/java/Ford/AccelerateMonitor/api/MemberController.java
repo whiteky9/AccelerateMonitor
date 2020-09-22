@@ -36,14 +36,7 @@ public class MemberController {
     @DeleteMapping(path = "{id}")
     public void deleteMember(@PathVariable("id") int id){ memberService.deleteMember(id); }
 
+    @PutMapping(path = "{id}")
+    public void updateMember(@PathVariable("id") int id, @RequestBody Member member) { memberService.updateMember(id, member);}
 
-
-/*
-    @PutMapping("/updateMember")
-    public String updateMember(@RequestBody Member member  ) throws InterruptedException, ExecutionException {
-        return memberService.updateMemberDetails(member);
-    }
-
-
-*/
 }

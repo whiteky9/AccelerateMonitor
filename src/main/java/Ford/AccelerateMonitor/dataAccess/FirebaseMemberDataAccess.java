@@ -164,5 +164,10 @@ public class FirebaseMemberDataAccess implements MemberInterface {
         membersRef.updateChildrenAsync(deleteUserById);
     }
 
+    @Override
+    public void updateMember(int id, Member member){
+
+    }
+
     final private FirebaseApp app;
 }

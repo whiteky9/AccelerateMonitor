@@ -164,6 +164,46 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
         membersRef.updateChildrenAsync(deleteUserById);
     }
 
+    @Override
+    public void updateMember(int id, Member member){
+        //creates reference to member list in database
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
+        DatabaseReference membersRef = DB.getReference("members");
+        Map<String, Member> updateUserById = new HashMap<>();
+        List<String> keys = new ArrayList<>();
+        //
+        membersRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                keys.add(dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        //
+        while(keys.size()==0){}
+        updateUserById.put(keys.get(0), member);
+        membersRef.setValueAsync(updateUserById);
+    }
+
     final private FirebaseApp app;
 
 }

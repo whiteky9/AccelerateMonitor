@@ -10,4 +10,5 @@ public interface MemberInterface {
     List<Member> getAllMembers();
     Member getMember(int id);
     void deleteMember(int id);
+    void updateMember(int id, Member member);
 }
