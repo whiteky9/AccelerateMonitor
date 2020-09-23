@@ -4,6 +4,7 @@ import Ford.AccelerateMonitor.model.Member;
 
 import java.util.List;
 
+// Interface to allow easy implementation of additional data sources.
 public interface MemberInterface {
 
     int insertMember(Member member);
