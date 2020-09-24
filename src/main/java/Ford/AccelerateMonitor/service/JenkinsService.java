@@ -11,4 +11,6 @@ public class JenkinsService {
 
     public JenkinsService(@Qualifier("jenkinsDataAccess") JenkinsInterface jenkinsInterface){ this.jenkinsInterface = jenkinsInterface; }
 
+    public void addRecord(/*Record record*/){ jenkinsInterface.addRecord(/*record*/); }
+
 }

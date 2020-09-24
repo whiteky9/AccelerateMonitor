@@ -19,23 +19,21 @@ public class MemberController {
         this.memberService = memberService;
     }
 
-    @PostMapping
-    public void addMember(@RequestBody Member member) {
-        memberService.addMember(member);
-    }
+    @PostMapping("/addMember")
+    public void addMember(@RequestBody Member member) { memberService.addMember(member); }
 
-    @GetMapping
+    @GetMapping("/getAllMembers")
     public List<Member> getAllMembers() {
         return memberService.getAllMembers();
     }
 
-    @GetMapping(path = "{id}")
+    @GetMapping(path = "/getMember/{id}")
     public Member getMember(@PathVariable("id") int id){ return memberService.getMember(id); }
 
-    @DeleteMapping(path = "{id}")
+    @DeleteMapping(path = "/deleteMember/{id}")
     public void deleteMember(@PathVariable("id") int id){ memberService.deleteMember(id); }
 
-    @PutMapping(path = "{id}")
+    @PutMapping(path = "/updateMember/{id}")
     public void updateMember(@PathVariable("id") int id, @RequestBody Member member) { memberService.updateMember(id, member);}
 
 }
