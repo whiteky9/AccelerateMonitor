@@ -11,20 +11,20 @@ import org.springframework.stereotype.Repository;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-@Repository("jenkinsDataAccess")
-public class JenkinsDataAccess implements JenkinsInterface {
+@Repository("trialJenkinsDataAccess")
+public class FirebaseTrialJenkinsAccess  implements JenkinsInterface {
 
-    public JenkinsDataAccess() throws IOException{
+    public FirebaseTrialJenkinsAccess () throws IOException{
         //creates connection to database
         FileInputStream serviceAccount =
-                new FileInputStream("auth\\cse498-capstone-firebase-adminsdk-4g11i-67fbf0b50a.json");
+                new FileInputStream("auth\\ford-501d7-firebase-adminsdk-svb09-9d40c15937.json");
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://cse498-capstone.firebaseio.com")
+                .setDatabaseUrl("https://ford-501d7.firebaseio.com/")
                 .build();
         //instantiates firebase app
-        this.app = FirebaseApp.initializeApp(options, "JenkinsFirebaseDatabase");
+        this.app = FirebaseApp.initializeApp(options, "JenkinsFirebaseTrialDatabase");
     }
 
     @Override
@@ -39,3 +39,5 @@ public class JenkinsDataAccess implements JenkinsInterface {
 
     final private FirebaseApp app;
 }
+
+
