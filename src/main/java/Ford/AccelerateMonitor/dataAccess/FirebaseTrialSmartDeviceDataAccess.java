@@ -17,20 +17,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Repository("SmartDeviceDataAccess")
-public class SmartDeviceDataAccess implements SmartDeviceInterface{
+@Repository("trialSmartDeviceDataAccess")
+public class FirebaseTrialSmartDeviceDataAccess implements SmartDeviceInterface{
 
     @Autowired
-    public SmartDeviceDataAccess() throws IOException{
+    public FirebaseTrialSmartDeviceDataAccess() throws IOException{
         FileInputStream serviceAccount =
-                new FileInputStream("auth\\cse498-capstone-firebase-adminsdk-4g11i-67fbf0b50a.json");
+                new FileInputStream("auth\\ford-501d7-firebase-adminsdk-svb09-9d40c15937.json");
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://cse498-capstone.firebaseio.com")
+                .setDatabaseUrl("https://ford-501d7.firebaseio.com/")
                 .build();
         //instantiates firebase app
-        this.app = FirebaseApp.initializeApp(options, "FirebaseSmartDeviceDatabase");
+        this.app = FirebaseApp.initializeApp(options, "FirebaseTrialSmartDeviceDatabase");
     }
 
     @Override
@@ -61,7 +61,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                 for (DataSnapshot child: dataSnapshot.getChildren()){
                     System.out.println(child.getValue());
                     Record record = child.getValue(Record.class);
-                    System.out.println(record.getProjectName());
+                    System.out.println(2);
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
                     Date recordDate = null;
                     try {
@@ -79,9 +79,8 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
 
             }
         });
-System.out.println("sterted!");
         while(records.size()==0){}
-System.out.println("done!");
+
         return records;
     }
 
@@ -92,15 +91,17 @@ System.out.println("done!");
         return records;
     }
     /*
-    * get record querying
-    *
-    * implement DB reference/snapshot
-    *
-    * dataraf.addChildListener()
-    * on ChildAdded{
-    *
-    * }
-    *
-    * */
+     * get record querying
+     *
+     * implement DB reference/snapshot
+     *
+     * dataraf.addChildListener()
+     * on ChildAdded{
+     *
+     * }
+     *
+     * */
     final private FirebaseApp app;
 }
+
+

@@ -2,25 +2,29 @@ package Ford.AccelerateMonitor.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class Record {
 
-    public Record(@JsonProperty("projectName") String projectname,
-                  @JsonProperty("commitId") String commitId,
+    public Record(@JsonProperty("projectName") String projectName,
+                  @JsonProperty("commitID") String commitID,
                   @JsonProperty("date") String date,
                   @JsonProperty("deployment") String deployment,
                   @JsonProperty("status") String status,
-                  @JsonProperty("env") String env){
-        this.projectName = projectname;
-        this.commitId = commitId;
+                  @JsonProperty("env") String env) throws ParseException {
+        this.projectName = projectName;
+        this.commitID = commitID;
         this.date = date;
-        this.deployment = deployment;
+        this.deployment = Boolean.parseBoolean(deployment);
         this.status = status;
         this.env = env;
     }
 
     public Record(){
         this.projectName = null;
-        this.commitId = null;
+        this.commitID = null;
         this.date = null;
         this.deployment = null;
         this.status = null;
@@ -36,27 +40,25 @@ public class Record {
         this.projectName = projectName;
     }
 
-    public String getCommitId() {
-        return commitId;
+    public String getCommitID() {
+        return commitID;
     }
 
-    public void setCommitId(String commitId) {
-        this.commitId = commitId;
+    public void setCommitID(String commitID) {
+        this.commitID = commitID;
     }
 
-    public String getDate() {
-        return date;
-    }
+    public String getDate() { return date; }
 
     public void setDate(String date) {
         this.date = date;
     }
 
-    public String getDeployment() {
+    public Boolean getDeployment() {
         return deployment;
     }
 
-    public void setDeployment(String deployment) {
+    public void setDeployment(Boolean deployment) {
         this.deployment = deployment;
     }
 
@@ -77,9 +79,9 @@ public class Record {
     }
 
     private String projectName;
-    private String commitId;
+    private String commitID;
     private String date;
-    private String deployment;
+    private Boolean deployment;
     private String status;
     private String env;
 

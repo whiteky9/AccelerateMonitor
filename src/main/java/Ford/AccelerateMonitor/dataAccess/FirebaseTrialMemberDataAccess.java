@@ -60,7 +60,6 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
         DatabaseReference getMembersRef = DB.getReference("members");
         List<Member> members = new ArrayList<>();
 
-
         getMembersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

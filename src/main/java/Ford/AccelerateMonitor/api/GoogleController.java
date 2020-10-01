@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+
 @RequestMapping("records")
 @RestController
 public class GoogleController {
@@ -19,8 +21,7 @@ public class GoogleController {
         this.smartDeviceService = smartDeviceService;
     }
 
-    //needs to receive json of request. possibly make a post request? or get request with body?
-    @GetMapping(path = "/accelerate")// needs to be fixed
-    public String getAccelerateStat(@RequestBody Request request){ return smartDeviceService.getAccelerateStat(request); }
+    @GetMapping(path = "/accelerate")
+    public String getAccelerateStat(@RequestBody Request request) throws ParseException { return smartDeviceService.getAccelerateStat(request); }
 
 }
