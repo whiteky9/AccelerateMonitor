@@ -33,7 +33,7 @@ public class SmartDeviceService {
             records = smartDeviceInterface.getDeploymentFrequencyRecords(request);
             float deploys = records.size();
             float days = (new Date(System.currentTimeMillis()).getTime() - request.getStartDate().getTime())*1000*60*60*24;
-            out = "Deployment Frequency is: " + deploys/days + " deploys per day";
+            out = "Deployment Frequency is: " + deploys+" " +days + " deploys per day";
         }
         if(request.getStatRequested().equals("Change Fail Percentage")){
             records = smartDeviceInterface.getChangeFailPercentageRecords(request);

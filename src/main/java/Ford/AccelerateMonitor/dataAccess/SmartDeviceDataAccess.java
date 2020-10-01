@@ -59,9 +59,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot child: dataSnapshot.getChildren()){
-                    System.out.println(child.getValue());
                     Record record = child.getValue(Record.class);
-                    System.out.println(record.getProjectName());
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
                     Date recordDate = null;
                     try {
@@ -79,9 +77,8 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
 
             }
         });
-System.out.println("sterted!");
         while(records.size()==0){}
-System.out.println("done!");
+
         return records;
     }
 
