@@ -32,10 +32,6 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
         //instantiates firebase app
         this.app = FirebaseApp.initializeApp(options, "FirebaseTrialDatabase");
     }
-
-    //
-    // adds a member into the database
-    //
     @Override
     public int insertMember(Member member){
         //creates reference to member list in database
@@ -59,6 +55,7 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference getMembersRef = DB.getReference("members");
         List<Member> members = new ArrayList<>();
+        final boolean[] complete = {false};
 
         getMembersRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -66,6 +63,7 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                     members.add(child.getValue(Member.class));
                 }
+                complete[0] = true;
             }
 
 
@@ -76,10 +74,9 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
         });
 
         //waits for listeners to update members
-        while(members.size()==0){}
+        while(!complete[0]){}
         return members;
     }
-
     //
     // gets member by id
     //
@@ -89,11 +86,13 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference getMemberRef = DB.getReference("members");
         List<Member> members = new ArrayList<>();
+        final boolean[] complete = {false};
 
         getMemberRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 members.add(dataSnapshot.getValue(Member.class));
+                complete[0] = true;
             }
 
             @Override
@@ -116,7 +115,7 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
 
             }
         });
-        while(members.size()==0){}
+        while(!complete[0]){}
         return members.get(0);
     }
 
@@ -130,11 +129,13 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
         DatabaseReference membersRef = DB.getReference("members");
         Map<String, Object> deleteUserById = new HashMap<>();
         List<String> keys = new ArrayList<>();
+        final boolean[] complete = {false};
         //
         membersRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 keys.add(dataSnapshot.getKey());
+                complete[0] = true;
             }
 
             @Override
@@ -158,7 +159,7 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
             }
         });
         //
-        while(keys.size()==0){}
+        while(!complete[0]){}
         deleteUserById.put(keys.get(0), null);
         membersRef.updateChildrenAsync(deleteUserById);
     }
@@ -170,11 +171,14 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
         DatabaseReference membersRef = DB.getReference("members");
         Map<String, Member> updateUserById = new HashMap<>();
         List<String> keys = new ArrayList<>();
+        final boolean[] complete = {false};
+
         //
         membersRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 keys.add(dataSnapshot.getKey());
+                complete[0] = true;
             }
 
             @Override
@@ -198,11 +202,10 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
             }
         });
         //
-        while(keys.size()==0){}
+        while(!complete[0]){}
         updateUserById.put(keys.get(0), member);
         membersRef.setValueAsync(updateUserById);
     }
 
     final private FirebaseApp app;
-
 }
