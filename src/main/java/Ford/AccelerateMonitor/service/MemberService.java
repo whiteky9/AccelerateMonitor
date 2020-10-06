@@ -24,9 +24,9 @@ public class MemberService {
         return memberInterface.getAllMembers();
     }
 
-    public Member getMember(int id) { return memberInterface.getMember(id); }
+    public Member getMember(String id) { return memberInterface.getMember(id); }
 
-    public void deleteMember(int id){ memberInterface.deleteMember(id); }
+    public void deleteMember(String id){ memberInterface.deleteMember(id); }
 
-    public void updateMember(int id, Member member){ memberInterface.updateMember(id, member); }
+    public void updateMember(String id, Member member){ memberInterface.updateMember(id, member); }
 }

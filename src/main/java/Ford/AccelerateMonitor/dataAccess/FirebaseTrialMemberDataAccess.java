@@ -10,10 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 //Data access class for experimental or testing purposes
 @Repository("trialDataAccess")
@@ -80,14 +77,14 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
     // gets member by id
     //
     @Override
-    public Member getMember(int id){
+    public Member getMember(String id){
         //creates reference to member list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference getMemberRef = DB.getReference("members");
         List<Member> members = new ArrayList<>();
         final boolean[] complete = {false};
 
-        getMemberRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
+        getMemberRef.orderByChild("id").equalTo(String.valueOf(id)).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 members.add(dataSnapshot.getValue(Member.class));
@@ -122,7 +119,7 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
     // removes member from database
     //
     @Override
-    public void deleteMember(int id){
+    public void deleteMember(String id){
         //creates reference to member list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference membersRef = DB.getReference("members");
@@ -130,7 +127,7 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
         List<String> keys = new ArrayList<>();
         final boolean[] complete = {false};
         //
-        membersRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
+        membersRef.orderByChild("id").equalTo(String.valueOf(id)).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 keys.add(dataSnapshot.getKey());
@@ -164,7 +161,7 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
     }
 
     @Override
-    public void updateMember(int id, Member member){
+    public void updateMember(String id, Member member){
         //creates reference to member list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference membersRef = DB.getReference("members");
@@ -173,7 +170,7 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
         final boolean[] complete = {false};
 
         //
-        membersRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
+        membersRef.orderByChild("id").equalTo(String.valueOf(id)).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 keys.add(dataSnapshot.getKey());

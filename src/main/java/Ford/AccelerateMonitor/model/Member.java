@@ -1,38 +1,35 @@
 package Ford.AccelerateMonitor.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.gson.JsonObject;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-
+import java.util.UUID;
 
 public class Member {
-    public Member(String name, String role, Integer id, Map<String,Object> teams) {
-        this.name = name;
-        this.role = role;
-        this.id = id;
-        this.teams = teams;
-    }
 
     public Member(){
-        this.id= null;
-        this.name=null;
+        this.firstName = null;
+        this.lastName = null;
+        this.password = null;
+        this.email = null;
+        this.id= UUID.randomUUID().toString();
         this.role=null;
         this.teams = null;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getFirstName() { return firstName; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getLastName() { return lastName; }
+
+    public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public String getEmail() { return email; }
+
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPassword() { return password; }
+
+    public void setPassword(String password) { this.password = password; }
 
     public String getRole() {
         return role;
@@ -42,11 +39,11 @@ public class Member {
         this.role = role;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -56,8 +53,11 @@ public class Member {
         this.teams = teams;
     }
 
-    private String name;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String password;
     private String role;
-    private Integer id;
+    private String id;
     private Map<String, Object> teams;
 }

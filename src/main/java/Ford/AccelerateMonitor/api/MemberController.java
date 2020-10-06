@@ -28,12 +28,12 @@ public class MemberController {
     }
 
     @GetMapping(path = "/getMember/{id}")
-    public Member getMember(@PathVariable("id") int id){ return memberService.getMember(id); }
+    public Member getMember(@PathVariable("id") String id){ return memberService.getMember(id); }
 
     @DeleteMapping(path = "/deleteMember/{id}")
-    public void deleteMember(@PathVariable("id") int id){ memberService.deleteMember(id); }
+    public void deleteMember(@PathVariable("id") String id){ memberService.deleteMember(id); }
 
     @PutMapping(path = "/updateMember/{id}")
-    public void updateMember(@PathVariable("id") int id, @RequestBody Member member) { memberService.updateMember(id, member);}
+    public void updateMember(@PathVariable("id") String id, @RequestBody Member member) { memberService.updateMember(id, member);}
 
 }
