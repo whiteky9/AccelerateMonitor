@@ -1,11 +1,5 @@
 package Ford.AccelerateMonitor.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class Record {
 
     public Record(String projectName, String commitID, String date,Boolean deployment, String status, String env) {

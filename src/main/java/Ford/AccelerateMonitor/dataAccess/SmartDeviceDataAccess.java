@@ -2,6 +2,7 @@ package Ford.AccelerateMonitor.dataAccess;
 
 import Ford.AccelerateMonitor.model.Record;
 import Ford.AccelerateMonitor.model.Request;
+import Ford.AccelerateMonitor.model.Team;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -16,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Repository("SmartDeviceDataAccess")
 public class SmartDeviceDataAccess implements SmartDeviceInterface{
@@ -48,37 +50,25 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
     }
 
     @Override
-    public List<Record> getDeploymentFrequencyRecords(Request request) throws ParseException {
+    public List<Record> getDeploymentFrequencyRecords(Request request){
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
-        DatabaseReference recordsRef = DB.getReference("records");
         List<Record> records = new ArrayList<>();
-        //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-        Date requestDate = request.getStartDate();
-
-        recordsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot child: dataSnapshot.getChildren()){
-                    Record record = child.getValue(Record.class);
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-                    Date recordDate = null;
-                    try {
-                        recordDate = sdf.parse(record.getDate());
-                    } catch (ParseException e) {
-
-                    }
-                    if(recordDate.after(requestDate) && record.getDeployment() && record.getProjectName().equals(request.getTargetProject()))
-                        records.add(record);
-                }
+        // query by project
+        if(request.getTargetProject() != null){
+            records = getDFRecordsByProject(records, request, DB);
+        }
+        // query by team
+        else if(request.getTargetTeam() != null){
+            List<String> projects = getProjectNamesByTeamName(request, DB);
+            for(int i=0; i<projects.size(); i++){
+                request.setTargetProjects(projects.get(i));
+                records = getDFRecordsByProject(records, request, DB);
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        while(records.size()==0){}
-
+            request.setTargetProjects(null);
+        }
+        else{
+            // error
+        }
         return records;
     }
 
@@ -88,16 +78,80 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
 
         return records;
     }
-    /*
-    * get record querying
-    *
-    * implement DB reference/snapshot
-    *
-    * dataraf.addChildListener()
-    * on ChildAdded{
-    *
-    * }
-    *
-    * */
+
     final private FirebaseApp app;
+
+    //
+    // helper functions
+    //
+    private List<Record> getDFRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
+        DatabaseReference recordsRef = DB.getReference("records");
+        Date requestDate = request.getStartDate();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        final Boolean[] complete = {false};
+        recordsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()){
+                    Record record = child.getValue(Record.class);
+                    Date recordDate = null;
+                    try {
+                        recordDate = sdf.parse(record.getDate());
+                    } catch (ParseException e) {
+
+                    }
+                    if(recordDate.after(requestDate) && record.getDeployment()) {
+                        records.add(record);
+                    }
+                }
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+        return records;
+    }
+
+    private List<String> getProjectNamesByTeamName(Request request, FirebaseDatabase DB){
+        final Team[] team = {null};
+        final Boolean[] complete = {false};
+        DatabaseReference teamsRef = DB.getReference("teams");
+        // query project list
+        teamsRef.orderByChild("name").equalTo(request.getTargetTeam()).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                team[0] = dataSnapshot.getValue(Team.class);
+                complete[0] = true;
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+        Set<String> p = team[0].getProjects().keySet();
+        List<String> projects = new ArrayList<>(p);
+        return projects;
+    }
 }
+
