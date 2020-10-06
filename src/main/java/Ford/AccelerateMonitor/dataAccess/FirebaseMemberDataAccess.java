@@ -42,10 +42,11 @@ public class FirebaseMemberDataAccess implements MemberInterface {
         DatabaseReference dataRef = DB.getReference();
         DatabaseReference membersRef = dataRef.child("members");
 
+
         //pushes provided member into the database
-        Map<String, Member> newMember = new HashMap<>();
+        Map<String, Object> newMember = new HashMap<>();
         newMember.put(member.getId(), member);
-		membersRef.setValueAsync(newMember);
+		membersRef.updateChildrenAsync(newMember);
     }
 
     //

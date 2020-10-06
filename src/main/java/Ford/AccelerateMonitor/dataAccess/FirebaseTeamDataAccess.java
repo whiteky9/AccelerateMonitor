@@ -1,6 +1,5 @@
 package Ford.AccelerateMonitor.dataAccess;
 
-import Ford.AccelerateMonitor.model.Member;
 import Ford.AccelerateMonitor.model.Team;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -40,8 +39,9 @@ public class FirebaseTeamDataAccess implements TeamInterface{
         DatabaseReference teamsRef = dataRef.child("teams");
 
         //pushes provided team into the database
-        DatabaseReference newTeamRef = teamsRef.push();
-        newTeamRef.setValueAsync(team);
+        Map<String, Object> newTeam = new HashMap<>();
+        newTeam.put(team.getId(), team);
+        teamsRef.updateChildrenAsync(newTeam);
     }
 
     @Override
@@ -74,14 +74,14 @@ public class FirebaseTeamDataAccess implements TeamInterface{
     }
 
     @Override
-    public Team getTeam(String name){
+    public Team getTeam(String id){
         //creates reference to team list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference getTeamRef = DB.getReference("teams");
         List<Team> teams = new ArrayList<>();
         final boolean[] complete = {false};
 
-        getTeamRef.orderByChild("name").equalTo(name).addChildEventListener(new ChildEventListener() {
+        getTeamRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 teams.add(dataSnapshot.getValue(Team.class));
@@ -113,7 +113,7 @@ public class FirebaseTeamDataAccess implements TeamInterface{
     }
 
     @Override
-    public void deleteTeam(String name){
+    public void deleteTeam(String id){
         //creates reference to team list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference teamsRef = DB.getReference("teams");
@@ -121,7 +121,7 @@ public class FirebaseTeamDataAccess implements TeamInterface{
         List<String> keys = new ArrayList<>();
         final boolean[] complete = {false};
         //
-        teamsRef.orderByChild("name").equalTo(name).addChildEventListener(new ChildEventListener() {
+        teamsRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 keys.add(dataSnapshot.getKey());
@@ -154,7 +154,7 @@ public class FirebaseTeamDataAccess implements TeamInterface{
     }
 
     @Override
-    public void updateTeam(String name, Team team){
+    public void updateTeam(String id, Team team){
         //creates reference to team list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference teamsRef = DB.getReference("teams");
@@ -162,7 +162,7 @@ public class FirebaseTeamDataAccess implements TeamInterface{
         List<String> keys = new ArrayList<>();
         final boolean[] complete = {false};
 
-        teamsRef.orderByChild("name").equalTo(name).addChildEventListener(new ChildEventListener() {
+        teamsRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 keys.add(dataSnapshot.getKey());

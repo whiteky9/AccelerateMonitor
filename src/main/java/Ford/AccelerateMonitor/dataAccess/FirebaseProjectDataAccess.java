@@ -38,8 +38,9 @@ public class FirebaseProjectDataAccess implements ProjectInterface{
         DatabaseReference projectsRef = dataRef.child("projects");
 
         //pushes provided project into the database
-        DatabaseReference newProjectRef = projectsRef.push();
-        newProjectRef.setValueAsync(project);
+        Map<String, Object> newProject = new HashMap<>();
+        newProject.put(project.getId(), project);
+        projectsRef.updateChildrenAsync(newProject);
     }
 
     @Override
@@ -72,14 +73,14 @@ public class FirebaseProjectDataAccess implements ProjectInterface{
     }
 
     @Override
-    public Project getProject(String name){
+    public Project getProject(String id){
         //creates reference to project list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference getProjectRef = DB.getReference("projects");
         List<Project> projects = new ArrayList<>();
         final boolean[] complete = {false};
 
-        getProjectRef.orderByChild("name").equalTo(name).addChildEventListener(new ChildEventListener() {
+        getProjectRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 projects.add(dataSnapshot.getValue(Project.class));
@@ -111,7 +112,7 @@ public class FirebaseProjectDataAccess implements ProjectInterface{
     }
 
     @Override
-    public void deleteProject(String name){
+    public void deleteProject(String id){
         //creates reference to project list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference projectsRef = DB.getReference("projects");
@@ -119,7 +120,7 @@ public class FirebaseProjectDataAccess implements ProjectInterface{
         List<String> keys = new ArrayList<>();
         final boolean[] complete = {false};
         //
-        projectsRef.orderByChild("name").equalTo(name).addChildEventListener(new ChildEventListener() {
+        projectsRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 keys.add(dataSnapshot.getKey());
@@ -152,7 +153,7 @@ public class FirebaseProjectDataAccess implements ProjectInterface{
     }
 
     @Override
-    public void updateProject(String name, Project project){
+    public void updateProject(String id, Project project){
         //creates reference to project list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference projectsRef = DB.getReference("projects");
@@ -160,7 +161,7 @@ public class FirebaseProjectDataAccess implements ProjectInterface{
         List<String> keys = new ArrayList<>();
         final boolean[] complete = {false};
 
-        projectsRef.orderByChild("name").equalTo(name).addChildEventListener(new ChildEventListener() {
+        projectsRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 keys.add(dataSnapshot.getKey());

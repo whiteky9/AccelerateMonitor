@@ -1,9 +1,12 @@
 package Ford.AccelerateMonitor.model;
 
+import java.util.UUID;
+
 public class Project {
     public Project(){
         this.name = null;
         this.team = null;
+        this.id = UUID.randomUUID().toString();
     }
 
     public String getName() {
@@ -22,6 +25,15 @@ public class Project {
         this.team = team;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     private String name;
+    private String id;
     private String team;
 }

@@ -21,9 +21,9 @@ public class TeamService {
         return teamInterface.getAllTeams();
     }
 
-    public Team getTeam(String name) { return teamInterface.getTeam(name); }
+    public Team getTeam(String id) { return teamInterface.getTeam(id); }
 
-    public void deleteTeam(String name){ teamInterface.deleteTeam(name); }
+    public void deleteTeam(String id){ teamInterface.deleteTeam(id); }
 
-    public void updateTeam(String name, Team team){ teamInterface.updateTeam(name, team); }
+    public void updateTeam(String id, Team team){ teamInterface.updateTeam(id, team); }
 }

@@ -1,10 +1,12 @@
 package Ford.AccelerateMonitor.model;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class Team {
     public Team(){
-
+        this.name = null;
+        this.id = UUID.randomUUID().toString();
     }
 
     public String getName() {
@@ -31,7 +33,16 @@ public class Team {
         this.members = members;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     private String name;
+    private String id;
     private Map<String,Object> projects;
     private Map<String,Object> members;
 }

@@ -25,12 +25,12 @@ public class TeamController {
         return teamService.getAllTeams();
     }
 
-    @GetMapping(path = "/getTeam/{name}")
-    public Team getTeam(@PathVariable("name") String name){ return teamService.getTeam(name); }
+    @GetMapping(path = "/getTeam/{id}")
+    public Team getTeam(@PathVariable("id") String id){ return teamService.getTeam(id); }
 
-    @DeleteMapping(path = "/deleteTeam/{name}")
-    public void deleteTeam(@PathVariable("name") String name){ teamService.deleteTeam(name); }
+    @DeleteMapping(path = "/deleteTeam/{id}")
+    public void deleteTeam(@PathVariable("id") String id){ teamService.deleteTeam(id); }
 
-    @PutMapping(path = "/updateTeam/{name}")
-    public void updateTeam(@PathVariable("name") String name, @RequestBody Team team) { teamService.updateTeam(name, team);}
+    @PutMapping(path = "/updateTeam/{id}")
+    public void updateTeam(@PathVariable("id") String id, @RequestBody Team team) { teamService.updateTeam(id, team);}
 }

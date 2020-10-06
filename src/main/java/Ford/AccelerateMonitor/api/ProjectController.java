@@ -25,12 +25,12 @@ public class ProjectController {
         return projectService.getAllProjects();
     }
 
-    @GetMapping(path = "/getProject/{name}")
-    public Project getProject(@PathVariable("name") String name){ return projectService.getProject(name); }
+    @GetMapping(path = "/getProject/{id}")
+    public Project getProject(@PathVariable("id") String id){ return projectService.getProject(id); }
 
-    @DeleteMapping(path = "/deleteProject/{name}")
-    public void deleteProject(@PathVariable("name") String name){ projectService.deleteProject(name); }
+    @DeleteMapping(path = "/deleteProject/{id}")
+    public void deleteProject(@PathVariable("id") String id){ projectService.deleteProject(id); }
 
-    @PutMapping(path = "/updateProject/{name}")
-    public void updateProject(@PathVariable("name") String name, @RequestBody Project project) { projectService.updateProject(name, project);}
+    @PutMapping(path = "/updateProject/{id}")
+    public void updateProject(@PathVariable("id") String id, @RequestBody Project project) { projectService.updateProject(id, project);}
 }
