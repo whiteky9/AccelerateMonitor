@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.Map;
 
 //Data Access class for final version of database
-@Repository("DataAccess")
+@Repository("memberDataAccess")
 public class FirebaseMemberDataAccess implements MemberInterface {
     @Autowired
     public FirebaseMemberDataAccess() throws IOException {
@@ -31,14 +31,14 @@ public class FirebaseMemberDataAccess implements MemberInterface {
                 .setDatabaseUrl("https://cse498-capstone.firebaseio.com")
                 .build();
         //instantiates firebase app
-        this.app = FirebaseApp.initializeApp(options, "FirebaseDatabase");
+        this.app = FirebaseApp.initializeApp(options, "FirebaseMemberDatabase");
     }
 
     //
     // adds a member into the database
     //
     @Override
-    public int insertMember(Member member){
+    public void insertMember(Member member){
         //creates reference to member list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference dataRef = DB.getReference();
@@ -47,8 +47,6 @@ public class FirebaseMemberDataAccess implements MemberInterface {
         //pushes provided member into the database
         DatabaseReference newMemberRef = membersRef.push();
 		newMemberRef.setValueAsync(member);
-
-		return 0;
     }
 
     //
@@ -163,7 +161,6 @@ public class FirebaseMemberDataAccess implements MemberInterface {
 
             }
         });
-        //
         while(!complete[0]){}
         deleteUserById.put(keys.get(0), null);
         membersRef.updateChildrenAsync(deleteUserById);
@@ -178,7 +175,6 @@ public class FirebaseMemberDataAccess implements MemberInterface {
         List<String> keys = new ArrayList<>();
         final boolean[] complete = {false};
 
-        //
         membersRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {

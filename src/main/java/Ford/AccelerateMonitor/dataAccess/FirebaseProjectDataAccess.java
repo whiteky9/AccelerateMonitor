@@ -1,6 +1,6 @@
 package Ford.AccelerateMonitor.dataAccess;
 
-import Ford.AccelerateMonitor.model.Member;
+import Ford.AccelerateMonitor.model.Project;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -15,52 +15,46 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//Data access class for experimental or testing purposes
-@Repository("trialDataAccess")
-public class FirebaseTrialMemberDataAccess implements MemberInterface {
-
+@Repository("projectDataAccess")
+public class FirebaseProjectDataAccess implements ProjectInterface{
     @Autowired
-    public FirebaseTrialMemberDataAccess() throws IOException {
+    public FirebaseProjectDataAccess() throws IOException {
         //creates connection to database
         FileInputStream serviceAccount =
-                new FileInputStream("auth\\ford-501d7-firebase-adminsdk-svb09-9d40c15937.json");
+                new FileInputStream("auth\\cse498-capstone-firebase-adminsdk-4g11i-67fbf0b50a.json");
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://ford-501d7.firebaseio.com/")
+                .setDatabaseUrl("https://cse498-capstone.firebaseio.com")
                 .build();
         //instantiates firebase app
-        this.app = FirebaseApp.initializeApp(options, "FirebaseTrialDatabase");
+        this.app = FirebaseApp.initializeApp(options, "FirebaseProjectDatabase");
     }
     @Override
-    public void insertMember(Member member){
-        //creates reference to member list in database
+    public void insertProject(Project project){
+        //creates reference to project list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference dataRef = DB.getReference();
-        DatabaseReference membersRef = dataRef.child("members");
+        DatabaseReference projectsRef = dataRef.child("projects");
 
-        //pushes provided member into the database
-        DatabaseReference newMemberRef = membersRef.push();
-        newMemberRef.setValueAsync(member);
-
+        //pushes provided project into the database
+        DatabaseReference newProjectRef = projectsRef.push();
+        newProjectRef.setValueAsync(project);
     }
 
-    //
-    // gets a list of all members from the database
-    //
     @Override
-    public List<Member> getAllMembers(){
-        //creates reference to member list in database
+    public List<Project> getAllProjects(){
+        //creates reference to project list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
-        DatabaseReference getMembersRef = DB.getReference("members");
-        List<Member> members = new ArrayList<>();
+        DatabaseReference getProjectsRef = DB.getReference("projects");
+        List<Project> projects = new ArrayList<>();
         final boolean[] complete = {false};
 
-        getMembersRef.addValueEventListener(new ValueEventListener() {
+        getProjectsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    members.add(child.getValue(Member.class));
+                    projects.add(child.getValue(Project.class));
                 }
                 complete[0] = true;
             }
@@ -72,25 +66,23 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
             }
         });
 
-        //waits for listeners to update members
+        //waits for listeners to update projects
         while(!complete[0]){}
-        return members;
+        return projects;
     }
-    //
-    // gets member by id
-    //
+
     @Override
-    public Member getMember(int id){
-        //creates reference to member list in database
+    public Project getProject(String name){
+        //creates reference to project list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
-        DatabaseReference getMemberRef = DB.getReference("members");
-        List<Member> members = new ArrayList<>();
+        DatabaseReference getProjectRef = DB.getReference("projects");
+        List<Project> projects = new ArrayList<>();
         final boolean[] complete = {false};
 
-        getMemberRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
+        getProjectRef.orderByChild("name").equalTo(name).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                members.add(dataSnapshot.getValue(Member.class));
+                projects.add(dataSnapshot.getValue(Project.class));
                 complete[0] = true;
             }
 
@@ -115,22 +107,19 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
             }
         });
         while(!complete[0]){}
-        return members.get(0);
+        return projects.get(0);
     }
 
-    //
-    // removes member from database
-    //
     @Override
-    public void deleteMember(int id){
-        //creates reference to member list in database
+    public void deleteProject(String name){
+        //creates reference to project list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
-        DatabaseReference membersRef = DB.getReference("members");
+        DatabaseReference projectsRef = DB.getReference("projects");
         Map<String, Object> deleteUserById = new HashMap<>();
         List<String> keys = new ArrayList<>();
         final boolean[] complete = {false};
         //
-        membersRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
+        projectsRef.orderByChild("name").equalTo(name).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 keys.add(dataSnapshot.getKey());
@@ -157,23 +146,21 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
 
             }
         });
-        //
         while(!complete[0]){}
         deleteUserById.put(keys.get(0), null);
-        membersRef.updateChildrenAsync(deleteUserById);
+        projectsRef.updateChildrenAsync(deleteUserById);
     }
 
     @Override
-    public void updateMember(int id, Member member){
-        //creates reference to member list in database
+    public void updateProject(String name, Project project){
+        //creates reference to project list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
-        DatabaseReference membersRef = DB.getReference("members");
-        Map<String, Member> updateUserById = new HashMap<>();
+        DatabaseReference projectsRef = DB.getReference("projects");
+        Map<String, Project> updateUserById = new HashMap<>();
         List<String> keys = new ArrayList<>();
         final boolean[] complete = {false};
 
-        //
-        membersRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
+        projectsRef.orderByChild("name").equalTo(name).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 keys.add(dataSnapshot.getKey());
@@ -202,8 +189,8 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
         });
         //
         while(!complete[0]){}
-        updateUserById.put(keys.get(0), member);
-        membersRef.setValueAsync(updateUserById);
+        updateUserById.put(keys.get(0), project);
+        projectsRef.setValueAsync(updateUserById);
     }
 
     final private FirebaseApp app;

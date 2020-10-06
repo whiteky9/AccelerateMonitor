@@ -58,7 +58,7 @@ public class FirebaseTrialSmartDeviceDataAccess implements SmartDeviceInterface{
         recordsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot child: dataSnapshot.getChildren()){
+                for (DataSnapshot child: dataSnapshot.getChildren()) {
                     System.out.println(child.getValue());
                     Record record = child.getValue(Record.class);
                     System.out.println(2);
@@ -69,7 +69,7 @@ public class FirebaseTrialSmartDeviceDataAccess implements SmartDeviceInterface{
                     } catch (ParseException e) {
 
                     }
-                    if(recordDate.after(requestDate) && record.getDeployment() && record.getProjectName().equals(request.getTargetProject()))
+                    if (recordDate.after(requestDate) && record.getDeployment() && record.getProjectName().equals(request.getTargetProject()))
                         records.add(record);
                 }
             }

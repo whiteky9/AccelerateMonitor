@@ -4,27 +4,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Request {
 
-    public Request(@JsonProperty("statRequested") String statRequested,
-                   @JsonProperty("targetTeam") String targetTeam,
-                   @JsonProperty("targetProject") String targetProject,
-                   @JsonProperty("startDate") String startDate/*,
-                   @JsonProperty("endDate") String endDate*/) throws ParseException {
+    public Request(String statRequested, String targetTeam, String targetProject, String startDate/*,String endDate*/) throws ParseException {
         this.statRequested = statRequested;
         this.targetTeam = targetTeam;
         this.targetProject = targetProject;//TODO if null get based on targetTeam
-        SimpleDateFormat sdf = new SimpleDateFormat("MM dd yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM dd yyyy");//TODO fix this
         this.startDate = sdf.parse(startDate);
-        //this.endDate = endDate;
+        //this.endDate = endDate;//TODO add later?
     }
 
     public Request(){
         this.statRequested = null;
         this.targetTeam = null;
-        this.targetProject = null;
         this.startDate = null;
         //this.endDate = null;
     }
@@ -45,11 +42,9 @@ public class Request {
         this.targetTeam = targetTeam;
     }
 
-    public String getTargetProject() {
-        return targetProject;
-    }
+    public String getTargetProject() { return targetProject; }
 
-    public void setTargetProject(String targetProject) {
+    public void setTargetProjects(String targetProject) {
         this.targetProject = targetProject;
     }
 
@@ -57,8 +52,9 @@ public class Request {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartDate(String startDate) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM dd yyyy");
+        this.startDate = sdf.parse(startDate);
     }
 
     /*public String getEndDate() {

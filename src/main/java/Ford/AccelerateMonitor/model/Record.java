@@ -8,16 +8,11 @@ import java.util.Date;
 
 public class Record {
 
-    public Record(@JsonProperty("projectName") String projectName,
-                  @JsonProperty("commitID") String commitID,
-                  @JsonProperty("date") String date,
-                  @JsonProperty("deployment") String deployment,
-                  @JsonProperty("status") String status,
-                  @JsonProperty("env") String env) throws ParseException {
+    public Record(String projectName, String commitID, String date,Boolean deployment, String status, String env) {
         this.projectName = projectName;
         this.commitID = commitID;
         this.date = date;
-        this.deployment = Boolean.parseBoolean(deployment);
+        this.deployment = deployment;
         this.status = status;
         this.env = env;
     }

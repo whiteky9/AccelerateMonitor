@@ -16,9 +16,9 @@ public class MemberService {
     private final MemberInterface memberInterface;
 
     @Autowired
-    public MemberService(@Qualifier("trialDataAccess") MemberInterface memberInterface){ this.memberInterface = memberInterface; }
+    public MemberService(@Qualifier("memberDataAccess") MemberInterface memberInterface){ this.memberInterface = memberInterface; }
 
-    public int addMember(Member member){ return memberInterface.insertMember(member); }
+    public void addMember(Member member){ memberInterface.insertMember(member); }
 
     public List<Member> getAllMembers(){
         return memberInterface.getAllMembers();
