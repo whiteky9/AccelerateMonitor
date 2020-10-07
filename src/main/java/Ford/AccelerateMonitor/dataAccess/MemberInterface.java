@@ -12,4 +12,6 @@ public interface MemberInterface {
     Member getMember(String id);
     void deleteMember(String id);
     void updateMember(String id, Member member);
+    void addTeam(String id, String team);
+    void removeTeam(String id, String team);
 }

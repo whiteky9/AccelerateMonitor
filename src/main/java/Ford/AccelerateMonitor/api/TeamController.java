@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("teams")
 @RestController
@@ -33,4 +34,16 @@ public class TeamController {
 
     @PutMapping(path = "/updateTeam/{id}")
     public void updateTeam(@PathVariable("id") String id, @RequestBody Team team) { teamService.updateTeam(id, team);}
+
+    @PutMapping(path = "/addMember/{id}")
+    public void addMember(@PathVariable("id") String id, @RequestBody Map<String,String> member){ teamService.addMember(id, member.get("member")); }
+
+    @PutMapping(path = "/removeMember/{id}")
+    public void removeMember(@PathVariable("id") String id, @RequestBody Map<String,String> member){ teamService.removeMember(id, member.get("member")); }
+
+    @PutMapping(path = "/addProject/{id}")
+    public void addProject(@PathVariable("id") String id, @RequestBody Map<String,String> project){ teamService.addProject(id, project.get("project")); }
+
+    @PutMapping(path = "/removeProject/{id}")
+    public void removeProject(@PathVariable("id") String id, @RequestBody Map<String,String> project){ teamService.removeProject(id, project.get("project")); }
 }

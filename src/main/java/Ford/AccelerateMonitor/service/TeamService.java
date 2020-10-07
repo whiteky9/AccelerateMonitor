@@ -26,4 +26,13 @@ public class TeamService {
     public void deleteTeam(String id){ teamInterface.deleteTeam(id); }
 
     public void updateTeam(String id, Team team){ teamInterface.updateTeam(id, team); }
+
+    public void addMember(String id, String member){ teamInterface.addMember(id, member); }
+
+    public void removeMember(String id, String member){ teamInterface.removeMember(id, member); }
+
+    public void addProject(String id, String project){ teamInterface.addProject(id, project); }
+
+    public void removeProject(String id, String project){ teamInterface.removeProject(id, project); }
+
 }

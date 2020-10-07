@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import Ford.AccelerateMonitor.model.Member;
 
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("members")
 @RestController
@@ -35,5 +36,12 @@ public class MemberController {
 
     @PutMapping(path = "/updateMember/{id}")
     public void updateMember(@PathVariable("id") String id, @RequestBody Member member) { memberService.updateMember(id, member);}
+
+    @PutMapping(path = "/addTeam/{id}")
+    public void addTeam(@PathVariable("id") String id, @RequestBody Map<String,String> team){ memberService.addTeam(id, team.get("team")); }
+
+    @PutMapping(path="/removeTeam/{id}")
+    public void removeTeam(@PathVariable("id") String id, @RequestBody Map<String,String> team){ memberService.removeTeam(id, team.get("team")); }
+
 
 }

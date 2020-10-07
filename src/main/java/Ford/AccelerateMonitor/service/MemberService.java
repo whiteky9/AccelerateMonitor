@@ -29,4 +29,9 @@ public class MemberService {
     public void deleteMember(String id){ memberInterface.deleteMember(id); }
 
     public void updateMember(String id, Member member){ memberInterface.updateMember(id, member); }
+
+    public void addTeam(String id, String team){ memberInterface.addTeam(id, team); }
+
+    public void removeTeam(String id, String team){ memberInterface.removeTeam(id, team); }
+
 }

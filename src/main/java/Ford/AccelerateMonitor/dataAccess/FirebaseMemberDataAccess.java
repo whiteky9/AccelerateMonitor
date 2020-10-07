@@ -208,5 +208,23 @@ public class FirebaseMemberDataAccess implements MemberInterface {
         membersRef.setValueAsync(updateUserById);
     }
 
+    @Override
+    public void addTeam(String id, String team){
+        Member member = getMember(id);
+        Map<String, Object> teams = member.getTeams();
+        teams.put(team,true);
+        member.setTeams(teams);
+        updateMember(id, member);
+    }
+
+    @Override
+    public void removeTeam(String id, String team){
+        Member member = getMember(id);
+        Map<String, Object> teams = member.getTeams();
+        teams.put(team,null);
+        member.setTeams(teams);
+        updateMember(id, member);
+    }
+
     final private FirebaseApp app;
 }

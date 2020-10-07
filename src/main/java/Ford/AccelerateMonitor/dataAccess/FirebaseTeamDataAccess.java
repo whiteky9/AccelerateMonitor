@@ -1,5 +1,6 @@
 package Ford.AccelerateMonitor.dataAccess;
 
+import Ford.AccelerateMonitor.model.Member;
 import Ford.AccelerateMonitor.model.Team;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -193,6 +194,42 @@ public class FirebaseTeamDataAccess implements TeamInterface{
         while(!complete[0]){}
         updateUserById.put(keys.get(0), team);
         teamsRef.setValueAsync(updateUserById);
+    }
+
+    @Override
+    public void addMember(String id, String member){
+        Team team = getTeam(id);
+        Map<String, Object> members = team.getMembers();
+        members.put(member,true);
+        team.setMembers(members);
+        updateTeam(id, team);
+    }
+
+    @Override
+    public void removeMember(String id, String member){
+        Team team = getTeam(id);
+        Map<String, Object> members = team.getMembers();
+        members.put(member,null);
+        team.setMembers(members);
+        updateTeam(id, team);
+    }
+
+    @Override
+    public void addProject(String id, String project){
+        Team team = getTeam(id);
+        Map<String, Object> projects = team.getProjects();
+        projects.put(project,true);
+        team.setProjects(projects);
+        updateTeam(id, team);
+    }
+
+    @Override
+    public void removeProject(String id, String project){
+        Team team = getTeam(id);
+        Map<String, Object> projects = team.getProjects();
+        projects.put(project,null);
+        team.setProjects(projects);
+        updateTeam(id, team);
     }
 
     final private FirebaseApp app;
