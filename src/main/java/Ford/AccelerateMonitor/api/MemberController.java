@@ -9,6 +9,7 @@ import Ford.AccelerateMonitor.model.Member;
 import java.util.List;
 import java.util.Map;
 
+@CrossOrigin(origins = "http://35.9.22.64:8888/")
 @RequestMapping("members")
 @RestController
 public class MemberController {
@@ -30,6 +31,10 @@ public class MemberController {
 
     @GetMapping(path = "/getMember/{id}")
     public Member getMember(@PathVariable("id") String id){ return memberService.getMember(id); }
+
+    /// get member by email
+    @GetMapping(path = "/getByEmail/{email}")
+    public Member getByEmail(@PathVariable("email") String email){ return memberService.getByEmail(email); }
 
     @DeleteMapping(path = "/deleteMember/{id}")
     public void deleteMember(@PathVariable("id") String id){ memberService.deleteMember(id); }

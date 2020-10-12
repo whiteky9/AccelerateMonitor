@@ -10,6 +10,7 @@ public interface MemberInterface {
     void insertMember(Member member);
     List<Member> getAllMembers();
     Member getMember(String id);
+    Member getByEmail(String email);
     void deleteMember(String id);
     void updateMember(String id, Member member);
     void addTeam(String id, String team);

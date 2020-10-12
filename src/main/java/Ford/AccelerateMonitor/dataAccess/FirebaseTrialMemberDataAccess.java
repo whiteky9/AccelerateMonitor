@@ -116,6 +116,52 @@ public class FirebaseTrialMemberDataAccess implements MemberInterface {
     }
 
     //
+    // get member email
+    //
+
+    //
+    // gets member by id
+    //
+    @Override
+    public Member getByEmail(String email){
+        //creates reference to member list in database
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
+        DatabaseReference getMemberRef = DB.getReference("members");
+        List<Member> members = new ArrayList<>();
+        final boolean[] complete = {false};
+
+        getMemberRef.orderByChild("email").equalTo(String.valueOf(email)).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                members.add(dataSnapshot.getValue(Member.class));
+                complete[0] = true;
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+        return members.get(0);
+    }
+
+    //
     // removes member from database
     //
     @Override

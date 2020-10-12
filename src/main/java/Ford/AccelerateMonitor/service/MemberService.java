@@ -26,6 +26,8 @@ public class MemberService {
 
     public Member getMember(String id) { return memberInterface.getMember(id); }
 
+    public Member getByEmail(String email) { return memberInterface.getByEmail(email); }
+
     public void deleteMember(String id){ memberInterface.deleteMember(id); }
 
     public void updateMember(String id, Member member){ memberInterface.updateMember(id, member); }
