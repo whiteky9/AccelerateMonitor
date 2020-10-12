@@ -1,8 +1,11 @@
 package Ford.AccelerateMonitor.product;
 
+import Ford.AccelerateMonitor.SpringContext;
 import Ford.AccelerateMonitor.model.Record;
+import Ford.AccelerateMonitor.service.JenkinsService;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -26,8 +29,7 @@ public class Jenkins extends Product {
      * */
     public Jenkins(
             String url, String jobName,
-            String userName, String token)
-    {
+            String userName, String token) {
         super(jobName);
         this.url = url;
         this.userName = userName;
@@ -47,6 +49,11 @@ public class Jenkins extends Product {
     private String getJobUrl()
     {
         return url+"/job/"+name+"/";
+    }
+
+    private JenkinsService getJenkinsService()
+    {
+        return SpringContext.getBean(JenkinsService.class);
     }
 
     /**
@@ -76,8 +83,7 @@ public class Jenkins extends Product {
      * Grabs list of all builds and creates record for each build
      * @return String list of all build logs - will change later
      * */
-    public List<String> getAllBuildLogs()
-    {
+    public void getAllBuildLogs() throws ParseException {
         String url = getJobUrl()+"api/json";
         JsonNode jsonNode = retreiveData(url);
 
@@ -93,7 +99,6 @@ public class Jenkins extends Product {
             // ONLY FINDS FIRST COMMIT ID LISTED
             // SKIP BUILD IF NO COMMIT ID
             if (buildData.findValue("SHA1") == null){
-                //allBuilds.add(buildData.get("number").asText());
                 continue;
             }
             String commitID = buildData.findValue("SHA1").asText();
@@ -108,14 +113,13 @@ public class Jenkins extends Product {
             String formatted = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z"));
 
             // GET DEPLOY BOOL - not implemented
-            // String deployString = buildData.get(0).get("parameters").get()
 
             // CREATE RECORD
-            //Record record = new Record(projectName, commitID, formatted, "true", result, env);
+            Record record = new Record(projectName, commitID, formatted, "true", result, env);
+            getJenkinsService().addRecord(record);
 
 
         }
-        return allBuilds;
 
     }
 
