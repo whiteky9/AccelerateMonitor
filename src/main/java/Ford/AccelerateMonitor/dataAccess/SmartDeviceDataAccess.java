@@ -1,5 +1,6 @@
 package Ford.AccelerateMonitor.dataAccess;
 
+import Ford.AccelerateMonitor.model.Build;
 import Ford.AccelerateMonitor.model.Record;
 import Ford.AccelerateMonitor.model.Request;
 import Ford.AccelerateMonitor.model.Team;
@@ -85,7 +86,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
     // helper functions
     //
     private List<Record> getDFRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
-        DatabaseReference recordsRef = DB.getReference("records");
+        DatabaseReference recordsRef = DB.getReference("records/builds");
         Date requestDate = request.getStartDate();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
         final Boolean[] complete = {false};
@@ -93,7 +94,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot child: dataSnapshot.getChildren()){
-                    Record record = child.getValue(Record.class);
+                    Build record = child.getValue(Build.class);
                     Date recordDate = null;
                     try {
                         recordDate = sdf.parse(record.getDate());
