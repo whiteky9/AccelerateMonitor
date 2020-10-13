@@ -21,7 +21,7 @@ public class FirebaseProjectDataAccess implements ProjectInterface{
     public FirebaseProjectDataAccess() throws IOException {
         //creates connection to database
         FileInputStream serviceAccount =
-                new FileInputStream("auth\\cse498-capstone-firebase-adminsdk-4g11i-67fbf0b50a.json");
+                new FileInputStream("cse498-capstone-firebase-adminsdk-4g11i-67fbf0b50a.json");
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
