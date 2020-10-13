@@ -3,7 +3,7 @@ package Ford.AccelerateMonitor.product;
 import Ford.AccelerateMonitor.SpringContext;
 import Ford.AccelerateMonitor.model.Build;
 import Ford.AccelerateMonitor.model.Record;
-import Ford.AccelerateMonitor.service.JenkinsService;
+import Ford.AccelerateMonitor.service.RecordsService;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.text.ParseException;
@@ -52,9 +52,9 @@ public class Jenkins extends Product {
         return url+"/job/"+name+"/";
     }
 
-    private JenkinsService getJenkinsService()
+    private RecordsService getRecordsService()
     {
-        return SpringContext.getBean(JenkinsService.class);
+        return SpringContext.getBean(RecordsService.class);
     }
 
     /**
@@ -117,7 +117,7 @@ public class Jenkins extends Product {
 
             // CREATE RECORD
             Record record = new Build(projectName, formatted, commitID, result, true, env);
-            getJenkinsService().addRecord(record);
+            getRecordsService().addRecord(record);
 
 
         }

@@ -1,8 +1,7 @@
 package Ford.AccelerateMonitor.product;
 
 import Ford.AccelerateMonitor.SpringContext;
-import Ford.AccelerateMonitor.model.IncidentRecord;
-import Ford.AccelerateMonitor.service.JenkinsService;
+import Ford.AccelerateMonitor.service.RecordsService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpEntity;
@@ -36,7 +35,7 @@ public class Incident extends TimerTask {
         return appUrl+"/actuator/health";
     }
 
-    public JenkinsService getJenkinsService(){ return SpringContext.getBean(JenkinsService.class); }
+    //public RecordsService getRecordsService(){ return SpringContext.getBean(RecordsService.class); }
 
     public String retreiveHealthStatus() {
 
@@ -90,7 +89,7 @@ public class Incident extends TimerTask {
                 {
                     // CREATE INCIDENT
                     //Record record = new IncidentRecord(projectName, date, "Down");
-                    //getJenkinsService().addRecord(record);
+                    //getRecordsService().addRecord(record);
                 }
                 ping = status;
             }
@@ -98,7 +97,7 @@ public class Incident extends TimerTask {
             {
                 // CREATE INCIDENT
                 //Record record = new IncidentRecord(projectName, date, "Restored");
-                //getJenkinsService().addRecord(record);
+                //getrecordsService().addRecord(record);
                 ping = "Not Available";
             }
 
