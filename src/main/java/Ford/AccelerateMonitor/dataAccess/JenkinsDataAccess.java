@@ -1,5 +1,7 @@
 package Ford.AccelerateMonitor.dataAccess;
 
+import Ford.AccelerateMonitor.model.Build;
+import Ford.AccelerateMonitor.model.IncidentRecord;
 import Ford.AccelerateMonitor.model.Record;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -31,10 +33,20 @@ public class JenkinsDataAccess implements JenkinsInterface {
     public void addRecord(Record record){
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference dataRef = DB.getReference();
-        DatabaseReference recordsRef = dataRef.child("records");
-
-        DatabaseReference newRecordRef = recordsRef.push();
-        newRecordRef.setValueAsync(record);
+        DatabaseReference recordsRef = dataRef.child("records/");
+        if(record.getClass() == (new Build()).getClass()) {
+            DatabaseReference buildsRef = recordsRef.child("builds/");
+            DatabaseReference newRecordRef = buildsRef.push();
+            newRecordRef.setValueAsync(record);
+        }
+        else if(record.getClass() == (new IncidentRecord()).getClass()){
+            DatabaseReference incidentsRef = recordsRef.child("incidents/");
+            DatabaseReference newRecordRef = incidentsRef.push();
+            newRecordRef.setValueAsync(record);
+        }
+        else {
+            //error
+        }
     }
 
     final private FirebaseApp app;

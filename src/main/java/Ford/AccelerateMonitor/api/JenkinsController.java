@@ -1,6 +1,6 @@
 package Ford.AccelerateMonitor.api;
 
-import Ford.AccelerateMonitor.model.Record;
+import Ford.AccelerateMonitor.model.Build;
 import Ford.AccelerateMonitor.service.JenkinsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +19,6 @@ public class JenkinsController {
         this.jenkinsService = jenkinsService;
     }
 
-    @PostMapping("/addRecord")
-    public void addRecord(@RequestBody Record record){ jenkinsService.addRecord(record
-    ); }
+    @PostMapping("/addJenkinsRecord")
+    public void addRecord(@RequestBody Build build){ jenkinsService.addRecord(build); }
 }

@@ -1,77 +1,47 @@
 package Ford.AccelerateMonitor.model;
 
-public class Record {
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.*;
 
-    public Record(String projectName, String commitID, String date,Boolean deployment, String status, String env) {
-        this.projectName = projectName;
-        this.commitID = commitID;
+/*
+@JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = IncidentRecord.class, name = "Incident")
+})*/
+public abstract class Record {
+
+    public Record(String projectName,String date) {
         this.date = date;
-        this.deployment = deployment;
-        this.status = status;
-        this.env = env;
+        this.projectName = projectName;
     }
 
     public Record(){
         this.projectName = null;
-        this.commitID = null;
         this.date = null;
-        this.deployment = null;
-        this.status = null;
-        this.env = null;
-
     }
 
-    public String getProjectName() {
-        return projectName;
-    }
+    public String getProjectName() { return projectName; }
 
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public String getCommitID() {
-        return commitID;
-    }
-
-    public void setCommitID(String commitID) {
-        this.commitID = commitID;
-    }
+    public void setProjectName(String projectName) { this.projectName = projectName; }
 
     public String getDate() { return date; }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
+    public void setDate(String date) {this.date = date; }
+/*
+    public abstract String getCommitID();
+    public abstract void setCommitID(String commitID);
+    public abstract Boolean getDeployment();
+    public abstract void setDeployment(Boolean deployment) ;
+    public abstract String getStatus() ;
+    public abstract void setStatus(String status) ;
+    public abstract String getEnv();
+    public abstract void setEnv(String env);
 
-    public Boolean getDeployment() {
-        return deployment;
-    }
-
-    public void setDeployment(Boolean deployment) {
-        this.deployment = deployment;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getEnv() {
-        return env;
-    }
-
-    public void setEnv(String env) {
-        this.env = env;
-    }
-
-    private String projectName;
-    private String commitID;
+    public String getType();
+    public void setType(String type) ;
+*/
     private String date;
-    private Boolean deployment;
-    private String status;
-    private String env;
-
+    private String projectName;
+    //private String type;
 }

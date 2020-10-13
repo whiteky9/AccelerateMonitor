@@ -1,6 +1,7 @@
 package Ford.AccelerateMonitor.product;
 
 import Ford.AccelerateMonitor.SpringContext;
+import Ford.AccelerateMonitor.model.Build;
 import Ford.AccelerateMonitor.model.Record;
 import Ford.AccelerateMonitor.service.JenkinsService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -115,7 +116,7 @@ public class Jenkins extends Product {
             // GET DEPLOY BOOL - not implemented
 
             // CREATE RECORD
-            Record record = new Record(projectName, commitID, formatted, true, result, env);
+            Record record = new Build(projectName, formatted, commitID, result, true, env);
             getJenkinsService().addRecord(record);
 
 
