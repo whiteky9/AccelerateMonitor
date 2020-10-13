@@ -115,7 +115,7 @@ public class Jenkins extends Product {
             // GET DEPLOY BOOL - not implemented
 
             // CREATE RECORD
-            Record record = new Record(projectName, commitID, formatted, "true", result, env);
+            Record record = new Record(projectName, commitID, formatted, true, result, env);
             getJenkinsService().addRecord(record);
 
 
