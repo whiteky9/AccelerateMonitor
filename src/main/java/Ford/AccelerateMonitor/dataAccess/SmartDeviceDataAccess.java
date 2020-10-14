@@ -1,9 +1,7 @@
 package Ford.AccelerateMonitor.dataAccess;
 
-import Ford.AccelerateMonitor.model.Build;
+import Ford.AccelerateMonitor.model.*;
 import Ford.AccelerateMonitor.model.Record;
-import Ford.AccelerateMonitor.model.Request;
-import Ford.AccelerateMonitor.model.Team;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -45,8 +43,21 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
 
     @Override
     public List<Record> getMTTRRecords(Request request){
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         List<Record> records = new ArrayList<>();
-
+        // query by project
+        if(request.getTargetProject() != null){
+            records = getMTTRRecordsByProject(records, request, DB);
+        }
+        // query by team
+        else if(request.getTargetTeam() != null){
+            List<String> projects = getProjectNamesByTeamName(request, DB);
+            for(int i=0; i<projects.size(); i++){
+                request.setTargetProjects(projects.get(i));
+                records = getMTTRRecordsByProject(records, request, DB);
+            }
+            request.setTargetProjects(null);
+        }
         return records;
     }
 
@@ -75,22 +86,92 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
 
     @Override
     public List<Record> getChangeFailPercentageRecords(Request request){
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         List<Record> records = new ArrayList<>();
-
+        // query by project
+        if(request.getTargetProject() != null){
+            records = getCFRecordsByProject(records, request, DB);
+        }
+        // query by team
+        else if(request.getTargetTeam() != null){
+            List<String> projects = getProjectNamesByTeamName(request, DB);
+            for(int i=0; i<projects.size(); i++){
+                request.setTargetProjects(projects.get(i));
+                records = getCFRecordsByProject(records, request, DB);
+            }
+            request.setTargetProjects(null);
+        }
+        else{
+            // error
+        }
         return records;
     }
 
-    final private FirebaseApp app;
+    @Override
+    public List<Record> getBuildRecords(Request request){
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
+        List<Record> records = new ArrayList<>();
+        // query by project
+        if(request.getTargetProject() != null){
+            records = getBuildRecordsByProject(records, request, DB);
+        }
+        // query by team
+        else if(request.getTargetTeam() != null){
+            List<String> projects = getProjectNamesByTeamName(request, DB);
+            for(int i=0; i<projects.size(); i++){
+                request.setTargetProjects(projects.get(i));
+                records = getBuildRecordsByProject(records, request, DB);
+            }
+            request.setTargetProjects(null);
+        }
+        else{
+            // error
+        }
+        return records;
+    }
 
     //
     // helper functions
     //
-    private List<Record> getDFRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
-        DatabaseReference recordsRef = DB.getReference("records/builds");
+    // Gets list of incident records
+    private List<Record> getMTTRRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
+        DatabaseReference incidentsRef = DB.getReference("records/incidents");
         Date requestDate = request.getStartDate();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
         final Boolean[] complete = {false};
-        recordsRef.addValueEventListener(new ValueEventListener() {
+        incidentsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()){
+                    IncidentRecord record = child.getValue(IncidentRecord.class);
+                    Date recordDate = null;
+                    try {
+                        recordDate = sdf.parse(record.getDate());
+                    } catch (ParseException e) {
+
+                    }
+                    if(recordDate.after(requestDate))
+                        records.add(record);
+                }
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+        return records;
+    }
+
+    // Gets list of Deployment records
+    private List<Record> getDFRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
+        DatabaseReference buildsRef = DB.getReference("records/builds");
+        Date requestDate = request.getStartDate();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        final Boolean[] complete = {false};
+        buildsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot child: dataSnapshot.getChildren()){
@@ -117,6 +198,73 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         return records;
     }
 
+    // Gets Change Fail records and puts them into list passed in
+    private List<Record> getCFRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
+        DatabaseReference buildsRef = DB.getReference("records/builds");
+        Date requestDate = request.getStartDate();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        final Boolean[] complete = {false};
+        buildsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()){
+                    Build record = child.getValue(Build.class);
+                    Date recordDate = null;
+                    try {
+                        recordDate = sdf.parse(record.getDate());
+                    } catch (ParseException e) {
+
+                    }
+                    if(recordDate.after(requestDate) && record.getDeployment()) {
+                        records.add(record);
+                    }
+                }
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+        return records;
+    }
+
+    //
+    List<Record> getBuildRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
+        DatabaseReference buildsRef = DB.getReference("records/builds");
+        Date requestDate = request.getStartDate();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        final Boolean[] complete = {false};
+        buildsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()){
+                    Build record = child.getValue(Build.class);
+                    Date recordDate = null;
+                    try {
+                        recordDate = sdf.parse(record.getDate());
+                    } catch (ParseException e) {
+
+                    }
+                    if(recordDate.after(requestDate)) {
+                        records.add(record);
+                    }
+                }
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+        return records;
+    }
+
+    // if the team name is requested, this function uses this name to obtain relevant projects
     private List<String> getProjectNamesByTeamName(Request request, FirebaseDatabase DB){
         final Team[] team = {null};
         final Boolean[] complete = {false};
@@ -154,5 +302,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         List<String> projects = new ArrayList<>(p);
         return projects;
     }
+
+    final private FirebaseApp app;
 }
 

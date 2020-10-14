@@ -12,4 +12,5 @@ public interface SmartDeviceInterface {
     List<Record> getMTTRRecords(Request request);
     List<Record> getDeploymentFrequencyRecords(Request request) throws ParseException;
     List<Record> getChangeFailPercentageRecords(Request request);
+    List<Record> getBuildRecords(Request request);
 }

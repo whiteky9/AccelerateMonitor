@@ -39,6 +39,11 @@ public class SmartDeviceService {
             records = smartDeviceInterface.getChangeFailPercentageRecords(request);
             //calculate and set to out
         }
+        if(request.getStatRequested().equals("Builds Executed")){
+            records = smartDeviceInterface.getBuildRecords(request);
+            int deploys = records.size();
+            out = deploys +" build(s) since " + request.getStartDate().toString() + ".";
+        }
         return out;
     }
 }

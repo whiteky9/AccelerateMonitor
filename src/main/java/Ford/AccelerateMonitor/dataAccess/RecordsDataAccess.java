@@ -23,7 +23,7 @@ public class RecordsDataAccess implements RecordsInterface {
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://cse498-capstone.firebaseio.com")
+                .setDatabaseUrl("https://cse498-catrialpstone.firebaseio.com")
                 .build();
         //instantiates firebase app
         this.app = FirebaseApp.initializeApp(options, "RecordsFirebaseDatabase");
@@ -38,6 +38,10 @@ public class RecordsDataAccess implements RecordsInterface {
             DatabaseReference buildsRef = recordsRef.child("builds/");
             DatabaseReference newRecordRef = buildsRef.push();
             newRecordRef.setValueAsync(record);
+
+            if(record.getStatus().equals("FAILURE")){
+                // send build failure notification
+            }
         }
         else if(record.getClass() == (new IncidentRecord()).getClass()){
             DatabaseReference incidentsRef = recordsRef.child("incidents/");

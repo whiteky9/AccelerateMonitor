@@ -25,6 +25,7 @@ public class Build extends Record{
         this.commitID = commitID;
     }
 
+    @Override
     public String getStatus() {
         return status;
     }

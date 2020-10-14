@@ -28,6 +28,8 @@ public abstract class Record {
     public String getDate() { return date; }
 
     public void setDate(String date) {this.date = date; }
+
+    public abstract String getStatus() ;
 /*
     public abstract String getCommitID();
     public abstract void setCommitID(String commitID);
