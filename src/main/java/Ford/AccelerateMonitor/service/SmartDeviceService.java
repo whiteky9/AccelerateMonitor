@@ -60,7 +60,6 @@ public class SmartDeviceService extends DialogflowApp {
             int deploys = records.size();
             out = deploys +" build(s) since " + request.getStartDate().toString() + ".";
         }
-        return out;
         ResponseBuilder responseBuilder = new ResponseBuilder().add(out);
         ActionResponse response = responseBuilder.build();
         return response.getWebhookResponse();
