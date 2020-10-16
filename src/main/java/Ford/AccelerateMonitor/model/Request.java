@@ -1,5 +1,9 @@
 package Ford.AccelerateMonitor.model;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,6 +24,25 @@ public class Request {
         this.targetTeam = null;
         this.startDate = null;
         //this.endDate = null;
+    }
+
+    public Request(String body) throws JSONException, ParseException {
+        JSONObject bodyJSON = new JSONObject(body);
+        JSONObject queryResult = bodyJSON.getJSONObject("queryResult");
+        JSONObject parameters = queryResult.getJSONObject("parameters");
+        String statRequested = parameters.get("statRequested").toString();
+        String targetTeam = parameters.get("targetTeam").toString();
+        String targetProject = parameters.get("targetProject").toString();
+        JSONObject datePeriod = parameters.getJSONObject("date-period");
+        String startDateString = datePeriod.get("startDate").toString();
+        this.setStatRequested(statRequested);
+        this.setTargetTeam(targetTeam);
+        this.setTargetProjects(targetProject);
+        DateFormat source = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+        Date date = source.parse(startDateString);
+        DateFormat dest = new SimpleDateFormat("MM dd yyyy");
+        startDateString = dest.format(date);
+        this.setStartDate(startDateString);
     }
 
     public String getStatRequested() {

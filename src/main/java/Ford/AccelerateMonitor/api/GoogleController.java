@@ -32,8 +32,7 @@ public class GoogleController {
     public WebhookResponse getAccelerateStat(HttpServletRequest http_request, HttpServletResponse response) throws IOException, JSONException, ParseException {
         String body = http_request.getReader().lines().collect(Collectors.joining());
         logger.info(new JSONObject(body).toString(4));
-        Request request = new Request();
-        smartDeviceService.extractValues(request, body);
+        Request request = new Request(body);
         return smartDeviceService.getAccelerateStat(request);
     }
 
