@@ -23,7 +23,7 @@ public class RecordsDataAccess implements RecordsInterface {
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://cse498-catrialpstone.firebaseio.com")
+                .setDatabaseUrl("https://cse498-capstone.firebaseio.com")
                 .build();
         //instantiates firebase app
         this.app = FirebaseApp.initializeApp(options, "RecordsFirebaseDatabase");

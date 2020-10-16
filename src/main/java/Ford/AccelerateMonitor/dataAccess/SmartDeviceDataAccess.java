@@ -150,7 +150,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                     } catch (ParseException e) {
 
                     }
-                    if(recordDate.after(requestDate))
+                    if(recordDate.after(requestDate) && request.getTargetProject().equals(record.getProjectName()))
                         records.add(record);
                 }
                 complete[0] = true;
@@ -182,7 +182,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                     } catch (ParseException e) {
 
                     }
-                    if(recordDate.after(requestDate) && record.getDeployment()) {
+                    if(recordDate.after(requestDate) && record.getDeployment() && request.getTargetProject().equals(record.getProjectName())) {
                         records.add(record);
                     }
                 }
@@ -215,7 +215,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                     } catch (ParseException e) {
 
                     }
-                    if(recordDate.after(requestDate) && record.getDeployment()) {
+                    if(recordDate.after(requestDate) && record.getDeployment() && request.getTargetProject().equals(record.getProjectName())) {
                         records.add(record);
                     }
                 }
@@ -248,7 +248,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                     } catch (ParseException e) {
 
                     }
-                    if(recordDate.after(requestDate)) {
+                    if(recordDate.after(requestDate) && request.getTargetProject().equals(record.getProjectName())) {
                         records.add(record);
                     }
                 }
