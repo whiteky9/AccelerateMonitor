@@ -53,17 +53,18 @@ public class Request {
         this.startDate = sdf.parse(startDate);
     }
 
-    /*public String getEndDate() {
+    /*public Date getEndDate() {
         return endDate;
-    }*/
+    }
 
-    /*public void setEndDate(String endDate) {
-        this.endDate = endDate;
-    }*///later maybe?
+    public void setEndDate(String endDate) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM dd yyyy");
+        this.endDate = sdf.parse(endDate);
+    }*/
 
     private String statRequested;
     private String targetTeam;
     private String targetProject;
     private Date startDate;
-    //private String endDate;
+    //private Date endDate;
 }
