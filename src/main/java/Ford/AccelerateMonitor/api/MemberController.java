@@ -9,7 +9,7 @@ import Ford.AccelerateMonitor.model.Member;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = "http://35.9.22.64:8888/")
+@CrossOrigin(origins = {"http://localhost:8081", "http://35.9.22.64:8888/"})
 @RequestMapping("members")
 @RestController
 public class MemberController {
