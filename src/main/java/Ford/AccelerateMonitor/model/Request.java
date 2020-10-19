@@ -13,8 +13,8 @@ public class Request {
     public Request(String statRequested, String targetTeam, String targetProject, String startDate/*,String endDate*/) throws ParseException {
         this.statRequested = statRequested;
         this.targetTeam = targetTeam;
-        this.targetProject = targetProject;//TODO if null get based on targetTeam
-        SimpleDateFormat sdf = new SimpleDateFormat("MM dd yyyy");//TODO fix this
+        this.targetProject = targetProject;
+        SimpleDateFormat sdf = new SimpleDateFormat("MM dd yyyy");
         this.startDate = sdf.parse(startDate);
         //this.endDate = endDate;//TODO add later?
     }
@@ -44,6 +44,7 @@ public class Request {
         startDateString = dest.format(date);
         this.setStartDate(startDateString);
     }
+
 
     public String getStatRequested() {
         return statRequested;

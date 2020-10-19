@@ -248,7 +248,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                     } catch (ParseException e) {
 
                     }
-                    if(recordDate.after(requestDate) && request.getTargetProject().equals(record.getProjectName())) {
+                    if(recordDate.after(requestDate) && request.getTargetProject().equalsIgnoreCase(record.getProjectName())) {
                         records.add(record);
                     }
                 }
