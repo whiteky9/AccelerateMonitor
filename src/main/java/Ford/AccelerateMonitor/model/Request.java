@@ -36,8 +36,14 @@ public class Request {
         JSONObject datePeriod = parameters.getJSONObject("date-period");
         String startDateString = datePeriod.get("startDate").toString();
         this.setStatRequested(statRequested);
-        this.setTargetTeam(targetTeam);
-        this.setTargetProjects(targetProject);
+        if(targetTeam.equals(""))
+            this.setTargetTeam(null);
+        else
+            this.setTargetTeam(targetTeam);
+        if(targetProject.equals(""))
+            this.setTargetProject(null);
+        else
+            this.setTargetProject(targetProject);
         DateFormat source = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
         Date date = source.parse(startDateString);
         DateFormat dest = new SimpleDateFormat("MM dd yyyy");
@@ -64,7 +70,7 @@ public class Request {
 
     public String getTargetProject() { return targetProject; }
 
-    public void setTargetProjects(String targetProject) {
+    public void setTargetProject(String targetProject) {
         this.targetProject = targetProject;
     }
 

@@ -46,17 +46,17 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         List<Record> records = new ArrayList<>();
         // query by project
-        if(request.getTargetProject().equals("")){
+        if(request.getTargetProject() != null){
             records = getMTTRRecordsByProject(records, request, DB);
         }
         // query by team
-        else if(request.getTargetTeam().equals("")){
+        else if(request.getTargetTeam() != null){
             List<String> projects = getProjectNamesByTeamName(request, DB);
             for(int i=0; i<projects.size(); i++){
-                request.setTargetProjects(projects.get(i));
+                request.setTargetProject(projects.get(i));
                 records = getMTTRRecordsByProject(records, request, DB);
             }
-            request.setTargetProjects(null);
+            request.setTargetProject(null);
         }
         return records;
     }
@@ -66,17 +66,17 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         List<Record> records = new ArrayList<>();
         // query by project
-        if(request.getTargetProject().equals("")){
+        if(request.getTargetProject()!= null){
             records = getDFRecordsByProject(records, request, DB);
         }
         // query by team
-        else if(request.getTargetTeam().equals("")){
+        else if(request.getTargetTeam()!= null){
             List<String> projects = getProjectNamesByTeamName(request, DB);
             for(int i=0; i<projects.size(); i++){
-                request.setTargetProjects(projects.get(i));
+                request.setTargetProject(projects.get(i));
                 records = getDFRecordsByProject(records, request, DB);
             }
-            request.setTargetProjects(null);
+            request.setTargetProject(null);
         }
         else{
             // error
@@ -89,17 +89,17 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         List<Record> records = new ArrayList<>();
         // query by project
-        if(request.getTargetProject().equals("")){
+        if(request.getTargetProject()!= null){
             records = getCFRecordsByProject(records, request, DB);
         }
         // query by team
-        else if(request.getTargetTeam().equals("")){
+        else if(request.getTargetTeam()!= null){
             List<String> projects = getProjectNamesByTeamName(request, DB);
             for(int i=0; i<projects.size(); i++){
-                request.setTargetProjects(projects.get(i));
+                request.setTargetProject(projects.get(i));
                 records = getCFRecordsByProject(records, request, DB);
             }
-            request.setTargetProjects(null);
+            request.setTargetProject(null);
         }
         else{
             // error
@@ -112,17 +112,17 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         List<Record> records = new ArrayList<>();
         // query by project
-        if(request.getTargetProject().equals("")){
+        if(request.getTargetProject() != null){
             records = getBuildRecordsByProject(records, request, DB);
         }
         // query by team
-        else if(request.getTargetTeam().equals("")){
+        else if(request.getTargetTeam() != null){
             List<String> projects = getProjectNamesByTeamName(request, DB);
             for(int i=0; i<projects.size(); i++){
-                request.setTargetProjects(projects.get(i));
+                request.setTargetProject(projects.get(i));
                 records = getBuildRecordsByProject(records, request, DB);
             }
-            request.setTargetProjects(null);
+            request.setTargetProject(null);
         }
         else{
             // error
