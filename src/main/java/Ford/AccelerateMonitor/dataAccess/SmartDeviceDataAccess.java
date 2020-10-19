@@ -46,11 +46,11 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         List<Record> records = new ArrayList<>();
         // query by project
-        if(request.getTargetProject() != null){
+        if(request.getTargetProject().equals("")){
             records = getMTTRRecordsByProject(records, request, DB);
         }
         // query by team
-        else if(request.getTargetTeam() != null){
+        else if(request.getTargetTeam().equals("")){
             List<String> projects = getProjectNamesByTeamName(request, DB);
             for(int i=0; i<projects.size(); i++){
                 request.setTargetProjects(projects.get(i));
@@ -66,11 +66,11 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         List<Record> records = new ArrayList<>();
         // query by project
-        if(request.getTargetProject() != null){
+        if(request.getTargetProject().equals("")){
             records = getDFRecordsByProject(records, request, DB);
         }
         // query by team
-        else if(request.getTargetTeam() != null){
+        else if(request.getTargetTeam().equals("")){
             List<String> projects = getProjectNamesByTeamName(request, DB);
             for(int i=0; i<projects.size(); i++){
                 request.setTargetProjects(projects.get(i));
@@ -89,11 +89,11 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         List<Record> records = new ArrayList<>();
         // query by project
-        if(request.getTargetProject() != null){
+        if(request.getTargetProject().equals("")){
             records = getCFRecordsByProject(records, request, DB);
         }
         // query by team
-        else if(request.getTargetTeam() != null){
+        else if(request.getTargetTeam().equals("")){
             List<String> projects = getProjectNamesByTeamName(request, DB);
             for(int i=0; i<projects.size(); i++){
                 request.setTargetProjects(projects.get(i));
@@ -112,11 +112,11 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         List<Record> records = new ArrayList<>();
         // query by project
-        if(request.getTargetProject() != null){
+        if(request.getTargetProject().equals("")){
             records = getBuildRecordsByProject(records, request, DB);
         }
         // query by team
-        else if(request.getTargetTeam() != null){
+        else if(request.getTargetTeam().equals("")){
             List<String> projects = getProjectNamesByTeamName(request, DB);
             for(int i=0; i<projects.size(); i++){
                 request.setTargetProjects(projects.get(i));
