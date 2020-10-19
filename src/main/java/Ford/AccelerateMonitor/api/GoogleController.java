@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.stream.Collectors;
 
+@CrossOrigin(origins = {"http://localhost:8081", "http://35.9.22.64:8888/"})
 @RequestMapping("records")
 @RestController
 public class GoogleController {
