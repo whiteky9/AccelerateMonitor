@@ -31,7 +31,10 @@ public class TeamController {
     }
 
     @GetMapping(path = "/getTeam/{id}")
-    public Team getTeam(@PathVariable("id") String id){ return teamService.getTeam(id); }
+    public Team getTeamById(@PathVariable("id") String id){ return teamService.getTeamById(id); }
+
+    @GetMapping(path = "/getTeam/{name}")
+    public Team getTeamByName(@PathVariable("name") String name){ return teamService.getTeamByName(name); }
 
     @DeleteMapping(path = "/deleteTeam/{id}")
     public void deleteTeam(@PathVariable("id") String id){ teamService.deleteTeam(id); }

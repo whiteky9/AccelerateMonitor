@@ -28,7 +28,10 @@ public class ProjectController {
     }
 
     @GetMapping(path = "/getProject/{id}")
-    public Project getProject(@PathVariable("id") String id){ return projectService.getProject(id); }
+    public Project getProjectById(@PathVariable("id") String id){ return projectService.getProjectById(id); }
+
+    @GetMapping(path = "/getProject/{name}")
+    public Project getProjectByName(@PathVariable("name") String name){ return projectService.getProjectByName(name); }
 
     @DeleteMapping(path = "/deleteProject/{id}")
     public void deleteProject(@PathVariable("id") String id){ projectService.deleteProject(id); }
