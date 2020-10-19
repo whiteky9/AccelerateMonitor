@@ -48,7 +48,7 @@ public class SmartDeviceService extends DialogflowApp {
             int deploys = records.size();
             Date current = new Date(System.currentTimeMillis());
             float days = (current.getTime() - request.getStartDate().getTime())/(1000*60*60*24);
-            out = deploys +" deploy(s) " + " in " + days + " days. Deployment Frequency is: " + df.format(deploys/days) +" " + " deploys per day";
+            out = deploys +" deploy(s) " + " in " + (int) days + " days. Deployment Frequency is: " + df.format(deploys/days) +" " + " deploys per day";
             System.out.println(out);
         }
         if(request.getStatRequested().equals("Change Fail Percentage")){
