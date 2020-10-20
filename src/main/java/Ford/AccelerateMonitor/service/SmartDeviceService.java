@@ -41,11 +41,16 @@ public class SmartDeviceService extends DialogflowApp {
         }
         if(request.getStatRequested().equalsIgnoreCase("deployment frequency")){
             records = smartDeviceInterface.getDeploymentFrequencyRecords(request);
-            int deploys = records.size();
-            Date current = new Date(System.currentTimeMillis());
-            float days = (current.getTime() - request.getStartDate().getTime())/(1000*60*60*24);
-            out = deploys +" deploy(s) " + " in " + (int) days + " days. Deployment Frequency is: " + df.format(deploys/days) +" " + " deploys per day";
-            System.out.println(out);
+            if (records == null){
+                out = "Team Does Not Exist.";
+            }
+            else {
+                int deploys = records.size();
+                Date current = new Date(System.currentTimeMillis());
+                float days = (current.getTime() - request.getStartDate().getTime()) / (1000 * 60 * 60 * 24);
+                out = deploys + " deploy(s) " + " in " + (int) days + " days. Deployment Frequency is: " + df.format(deploys / days) + " " + " deploys per day";
+                System.out.println(out);
+            }
         }
         if(request.getStatRequested().equalsIgnoreCase("Change Fail Percentage")){
             records = smartDeviceInterface.getChangeFailPercentageRecords(request);
@@ -53,9 +58,15 @@ public class SmartDeviceService extends DialogflowApp {
         }
         if(request.getStatRequested().equalsIgnoreCase("Builds Executed")){
             records = smartDeviceInterface.getBuildRecords(request);
-            int deploys = records.size();
-            out = deploys +" build(s) since " + request.getStartDate().toString() + ".";
+            if (records == null){
+                out = "Team Does Not Exist.";
+            }
+            else {
+                int deploys = records.size();
+                out = deploys + " build(s) since " + request.getStartDate().toString() + ".";
+            }
         }
+
         return out;
     }
 
