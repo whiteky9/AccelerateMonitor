@@ -37,6 +37,58 @@ public class Jenkins extends Product {
         this.token = token;
     }
 
+    /** Default Constructor
+     * For constructing via rest calls
+     */
+    public Jenkins(){
+        super();
+        this.url = null;
+        this.userName = null;
+        this.token = null;
+        this.env = "PROD";
+        this.projectName = null;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public String getEnv() {
+        return env;
+    }
+
+    public void setEnv(String env) {
+        this.env = env;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
     private String url;
 
     private String userName;

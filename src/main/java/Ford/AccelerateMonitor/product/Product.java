@@ -17,6 +17,16 @@ public abstract class Product {
         this.name = name;
     }
 
+    protected Product(){ this.name = null; }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     /**
      * Method to retrieve data from Jenkins Remote Access API
      * @param url Url to send GET request to
