@@ -52,9 +52,13 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         // query by team
         else if(request.getTargetTeam() != null){
             List<String> projects = getProjectNamesByTeamName(request, DB);
-            for(int i=0; i<projects.size(); i++){
-                request.setTargetProject(projects.get(i));
-                records = getMTTRRecordsByProject(records, request, DB);
+            if (projects == null)
+                records = null;
+            else {
+                for (int i = 0; i < projects.size(); i++) {
+                    request.setTargetProject(projects.get(i));
+                    records = getMTTRRecordsByProject(records, request, DB);
+                }
             }
             request.setTargetProject(null);
         }
@@ -72,9 +76,13 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         // query by team
         else if(request.getTargetTeam()!= null){
             List<String> projects = getProjectNamesByTeamName(request, DB);
-            for(int i=0; i<projects.size(); i++){
-                request.setTargetProject(projects.get(i));
-                records = getDFRecordsByProject(records, request, DB);
+            if (projects == null)
+                records = null;
+            else {
+                for (int i = 0; i < projects.size(); i++) {
+                    request.setTargetProject(projects.get(i));
+                    records = getDFRecordsByProject(records, request, DB);
+                }
             }
             request.setTargetProject(null);
         }
@@ -95,9 +103,13 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         // query by team
         else if(request.getTargetTeam()!= null){
             List<String> projects = getProjectNamesByTeamName(request, DB);
-            for(int i=0; i<projects.size(); i++){
-                request.setTargetProject(projects.get(i));
-                records = getCFRecordsByProject(records, request, DB);
+            if (projects == null)
+                records = null;
+            else {
+                for (int i = 0; i < projects.size(); i++) {
+                    request.setTargetProject(projects.get(i));
+                    records = getCFRecordsByProject(records, request, DB);
+                }
             }
             request.setTargetProject(null);
         }
@@ -118,9 +130,13 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         // query by team
         else if(request.getTargetTeam() != null){
             List<String> projects = getProjectNamesByTeamName(request, DB);
-            for(int i=0; i<projects.size(); i++){
-                request.setTargetProject(projects.get(i));
-                records = getBuildRecordsByProject(records, request, DB);
+            if (projects == null)
+                records = null;
+            else {
+                for (int i = 0; i < projects.size(); i++) {
+                    request.setTargetProject(projects.get(i));
+                    records = getBuildRecordsByProject(records, request, DB);
+                }
             }
             request.setTargetProject(null);
         }
@@ -266,30 +282,22 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
 
     // if the team name is requested, this function uses this name to obtain relevant projects
     private List<String> getProjectNamesByTeamName(Request request, FirebaseDatabase DB){
-        final Team[] team = {null};
+        final Team[] teams = {null};
         final Boolean[] complete = {false};
         DatabaseReference teamsRef = DB.getReference("teams");
         // query project list
-        teamsRef.orderByChild("name").equalTo(request.getTargetTeam()).addChildEventListener(new ChildEventListener() {
+        teamsRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                team[0] = dataSnapshot.getValue(Team.class);
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                teams[0] = null;
+                for (DataSnapshot child: dataSnapshot.getChildren()){
+                    Team team = child.getValue(Team.class);
+                    if (team.getName().equals(request.getTargetTeam())){
+                        teams[0] = team;
+                        complete[0] = true;
+                    }
+                }
                 complete[0] = true;
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
@@ -298,8 +306,11 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
             }
         });
         while(!complete[0]){}
-        Set<String> p = team[0].getProjects().keySet();
-        List<String> projects = new ArrayList<>(p);
+        List<String> projects = null;
+        if(teams[0] != null){
+            Set<String> p = teams[0].getProjects().keySet();
+            projects = new ArrayList<>(p);
+        }
         return projects;
     }
 
