@@ -1,5 +1,6 @@
 package Ford.AccelerateMonitor.dataAccess;
 
+import Ford.AccelerateMonitor.product.Github;
 import Ford.AccelerateMonitor.product.Jenkins;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -38,6 +39,18 @@ public class FirebaseProductDataAccess implements ProductInterface{
         //pushes provided member into the database
         DatabaseReference newRecordRef = jenkinsRef.push();
         newRecordRef.setValueAsync(jenkins);
+    }
+
+    @Override
+    public void addGithub(Github github){
+        //creates reference to member list in database
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
+        DatabaseReference dataRef = DB.getReference();
+        DatabaseReference githubRef = dataRef.child("products/github");
+
+        //pushes provided member into the database
+        DatabaseReference newRecordRef = githubRef.push();
+        newRecordRef.setValueAsync(github);
     }
 
     final private FirebaseApp app;

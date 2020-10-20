@@ -5,6 +5,8 @@ import Ford.AccelerateMonitor.dataAccess.RecordsInterface;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+
 @Service
 public class RecordsService {
 
@@ -12,6 +14,6 @@ public class RecordsService {
 
     public RecordsService(@Qualifier("recordsDataAccess") RecordsInterface recordsInterface){ this.recordsInterface = recordsInterface; }
 
-    public void addRecord(Record record){ recordsInterface.addRecord(record); }
+    public void addRecord(Record record) throws ParseException { recordsInterface.addRecord(record); }
 
 }

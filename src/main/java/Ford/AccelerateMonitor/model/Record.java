@@ -29,7 +29,11 @@ public abstract class Record {
 
     public void setDate(String date) {this.date = date; }
 
-    public abstract String getStatus() ;
+    public String getStatus() {return null;};
+
+    public String getUser() {return null;};
+
+    public String getSha() {return null;};
 /*
     public abstract String getCommitID();
     public abstract void setCommitID(String commitID);
