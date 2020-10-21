@@ -35,9 +35,26 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
     }
 
     @Override
-    public List<Record> getLeadTimeRecords(Request request){
+    public List<Record> getLeadTimeRecords(Request request) {
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         List<Record> records = new ArrayList<>();
+        if(request.getTargetProject() != null){
+            records = getLeadTimeRecordsByProject(records, request, DB);
+        }
+        // query by team
+        else if(request.getTargetTeam() != null){
+            List<String> projects = getProjectNamesByTeamName(request, DB);
+            if (projects == null)
+                records = null;
+            else {
+                for (int i = 0; i < projects.size(); i++) {
+                    request.setTargetProject(projects.get(i));
+                    records = getLeadTimeRecordsByProject(records, request, DB);
+                }
+            }
+            request.setTargetProject(null);
 
+        }
         return records;
     }
 
@@ -150,6 +167,12 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
     // helper functions
     //
     // Gets list of incident records
+    private List<Record> getLeadTimeRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
+        DatabaseReference commitsRef = DB.getReference("records/commits");
+        //TODO
+        return records;
+    }
+
     private List<Record> getMTTRRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
         DatabaseReference incidentsRef = DB.getReference("records/incidents");
         Date requestDate = request.getStartDate();

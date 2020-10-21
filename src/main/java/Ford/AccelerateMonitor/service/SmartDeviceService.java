@@ -33,7 +33,11 @@ public class SmartDeviceService extends DialogflowApp {
         DecimalFormat df = new DecimalFormat("0.00");
         if(request.getStatRequested().equalsIgnoreCase("Lead Time")){
             records = smartDeviceInterface.getLeadTimeRecords(request);
-            //calculate and set to out
+            if (records == null)
+                out = "Team Does Not Exist.";
+            else {
+            // TODO
+            }
         }
         if(request.getStatRequested().equalsIgnoreCase("mean time to restore")){
             records = smartDeviceInterface.getMTTRRecords(request);
@@ -41,15 +45,13 @@ public class SmartDeviceService extends DialogflowApp {
         }
         if(request.getStatRequested().equalsIgnoreCase("deployment frequency")){
             records = smartDeviceInterface.getDeploymentFrequencyRecords(request);
-            if (records == null){
+            if (records == null)
                 out = "Team Does Not Exist.";
-            }
             else {
                 int deploys = records.size();
                 Date current = new Date(System.currentTimeMillis());
                 float days = (current.getTime() - request.getStartDate().getTime()) / (1000 * 60 * 60 * 24);
                 out = deploys + " deploy(s) " + " in " + (int) days + " days. Deployment Frequency is: " + df.format(deploys / days) + " " + " deploys per day";
-                System.out.println(out);
             }
         }
         if(request.getStatRequested().equalsIgnoreCase("Change Fail Percentage")){
@@ -58,9 +60,8 @@ public class SmartDeviceService extends DialogflowApp {
         }
         if(request.getStatRequested().equalsIgnoreCase("Builds Executed")){
             records = smartDeviceInterface.getBuildRecords(request);
-            if (records == null){
+            if (records == null)
                 out = "Team Does Not Exist.";
-            }
             else {
                 int deploys = records.size();
                 out = deploys + " build(s) since " + request.getStartDate().toString() + ".";
