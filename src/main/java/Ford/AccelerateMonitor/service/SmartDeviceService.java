@@ -6,9 +6,6 @@ import Ford.AccelerateMonitor.model.Record;
 import Ford.AccelerateMonitor.model.Request;
 import com.google.actions.api.DialogflowApp;
 import com.google.api.services.dialogflow_fulfillment.v2.model.WebhookResponse;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -65,9 +62,11 @@ public class SmartDeviceService extends DialogflowApp {
                     temp = recordIterator.next();
 
                     // Assuming incident records are in order of time stamp (down record before restored record)
+                    // Assuming when asking for MTTR by team, there may be more than one project
+                    // Does NOT consider if there is a restored record with no matching down record
                     // Add every Down record to temporary hash map with project name as key
                     // Next Restored record with the same project name is a match
-                    // Add Record pair to pair list and remove from hash map
+                    // For each pair calculate time to restore and add to sum
                     if (temp.getStatus().equals("Down")) {
                         tempMap.put(temp.getProjectName(), temp);
                     } else if (temp.getStatus().equals("Restored")) {
