@@ -1,6 +1,8 @@
 package Ford.AccelerateMonitor.product;
 
 import Ford.AccelerateMonitor.SpringContext;
+import Ford.AccelerateMonitor.model.IncidentRecord;
+import Ford.AccelerateMonitor.model.Record;
 import Ford.AccelerateMonitor.service.RecordsService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +14,12 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.TimerTask;
 
 public class Incident extends TimerTask {
@@ -21,21 +29,35 @@ public class Incident extends TimerTask {
     // to the properties of
     // the entity
     public Incident(
-            String appUrl)
+            String appUrl, String projectName)
     {
 
         this.appUrl = appUrl;
+        this.projectName = projectName;
 
     }
 
     private String appUrl;
+
+    private String projectName;
+
+    private boolean isIncident = false;
+
+    private void createIncident(String status) throws ParseException {
+        Date date= new Date();
+        ZonedDateTime dateTime = Instant.ofEpochMilli(date.getTime())
+                .atZone(ZoneId.of("EST5EDT"));
+        String formatted = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z"));
+        Record record = new IncidentRecord(projectName, formatted, status);
+        getRecordsService().addRecord(record);
+    }
 
     public String getHealthUrl()
     {
         return appUrl+"/actuator/health";
     }
 
-    //public RecordsService getRecordsService(){ return SpringContext.getBean(RecordsService.class); }
+    public RecordsService getRecordsService(){ return SpringContext.getBean(RecordsService.class); }
 
     public String retreiveHealthStatus() {
 
@@ -67,6 +89,11 @@ public class Incident extends TimerTask {
 
     }
 
+    // If user registers incidents with application URL
+    // Run following lines of code:
+    // Incident incident = new Incident("http://localhost:8888/actuator/health", "test-project");
+    // Timer timer = new Timer();
+    // timer.schedule(incident, 0, 10000);
     public void run()
     {
         String ping = "Before Ping";
@@ -85,27 +112,41 @@ public class Incident extends TimerTask {
             if (code == 200)
             {
                 String status = this.retreiveHealthStatus();
-                if (status == "DOWN")
+                if (!isIncident && status.equals("DOWN"))
                 {
-                    // CREATE INCIDENT
-                    //Record record = new IncidentRecord(projectName, date, "Down");
-                    //getRecordsService().addRecord(record);
+                    isIncident = true;
+                    // CREATE DOWN RECORD
+                    createIncident("Down");
+                } else if (isIncident && status.equals("UP")) {
+                    // CREATE RESTORED RECORD
+                    isIncident = false;
+                    createIncident("Restored");
                 }
                 ping = status;
             }
-            else
+            else if (!isIncident)
             {
-                // CREATE INCIDENT
-                //Record record = new IncidentRecord(projectName, date, "Restored");
-                //getrecordsService().addRecord(record);
+                isIncident = true;
+                // CREATE DOWN RECORD
+                createIncident("Down");
                 ping = "Not Available";
             }
 
 
         } catch (Exception e)
         {
-            // CREATE INCIDENT
-            ping = "Bad Domain: "+ e.getMessage();
+            if (!isIncident)
+            {
+                isIncident = true;
+                // CREATE DOWN RECORD
+                try {
+                    createIncident("Down");
+                } catch (ParseException parseException) {
+                    parseException.printStackTrace();
+                }
+                ping = "Bad Domain: "+ e.getMessage();
+            }
+
         }
 
         System.out.print(ping + '\n');

@@ -14,8 +14,10 @@ import com.google.actions.api.response.ResponseBuilder;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 
 @Service
@@ -41,7 +43,55 @@ public class SmartDeviceService extends DialogflowApp {
         }
         if(request.getStatRequested().equalsIgnoreCase("mean time to restore")){
             records = smartDeviceInterface.getMTTRRecords(request);
-            //calculate and set to out
+
+            if (records.isEmpty())
+                out = "Team or Project Does Not Exist.";
+            else {
+                // Match up records into pairs
+                int pairCount = 0;
+                Long sum = new Long(0);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
+
+                HashMap<String, Record> tempMap = new HashMap<>();
+                Iterator<Record> recordIterator = records.iterator();
+                Record temp;
+
+                while (recordIterator.hasNext()) {
+
+                    // Temporarily store record
+                    temp = recordIterator.next();
+
+                    // Assuming incident records are in order of time stamp (down record before restored record)
+                    // Assuming when asking for MTTR by team, there may be more than one project
+                    // Does NOT consider if there is a restored record with no matching down record
+                    // Add every Down record to temporary hash map with project name as key
+                    // Next Restored record with the same project name is a match
+                    // For each pair calculate time to restore and add to sum
+                    if (temp.getStatus().equals("Down")) {
+                        tempMap.put(temp.getProjectName(), temp);
+                    } else if (temp.getStatus().equals("Restored")) {
+
+                        LocalDateTime downDate = LocalDateTime.parse(temp.getDate(), formatter);
+                        LocalDateTime restoredDate = LocalDateTime.parse(tempMap.get(temp.getProjectName()).getDate(), formatter);
+
+                        Duration duration = Duration.between(restoredDate, downDate);
+                        Long durationSeconds = duration.getSeconds();
+                        sum += durationSeconds;
+
+                        pairCount++;
+
+                        tempMap.remove(temp.getProjectName());
+                    }
+                }
+                if (pairCount == 0) {
+                    out = "No incident pairs.";
+                } else {
+                    float mttr = sum/pairCount/60;
+                    out =  pairCount + " incident record pair(s). MTTR is: "+ (int)mttr + " minutes";
+                }
+
+            }
+
         }
         if(request.getStatRequested().equalsIgnoreCase("deployment frequency")){
             records = smartDeviceInterface.getDeploymentFrequencyRecords(request);
