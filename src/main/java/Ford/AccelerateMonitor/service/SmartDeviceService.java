@@ -38,6 +38,7 @@ public class SmartDeviceService extends DialogflowApp {
             if (records == null)
                 out = "Team Does Not Exist.";
             else {
+                out = "in lead time";
             // TODO
             }
         }

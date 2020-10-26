@@ -32,6 +32,7 @@ public class Request {
         JSONObject parameters = queryResult.getJSONObject("parameters");
         String statRequested = parameters.get("statRequested").toString();
         String targetTeam = parameters.get("targetTeam").toString();
+        targetTeam = targetTeam.substring(0,1).toUpperCase() + targetTeam.substring(1);
         String targetProject = parameters.get("targetProject").toString();
         JSONObject datePeriod = parameters.getJSONObject("date-period");
         String startDateString = datePeriod.get("startDate").toString();
