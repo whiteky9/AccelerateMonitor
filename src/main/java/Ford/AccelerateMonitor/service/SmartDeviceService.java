@@ -2,6 +2,8 @@ package Ford.AccelerateMonitor.service;
 
 import Ford.AccelerateMonitor.api.GoogleController;
 import Ford.AccelerateMonitor.dataAccess.SmartDeviceInterface;
+import Ford.AccelerateMonitor.model.Build;
+import Ford.AccelerateMonitor.model.Commit;
 import Ford.AccelerateMonitor.model.Record;
 import Ford.AccelerateMonitor.model.Request;
 import com.google.actions.api.DialogflowApp;
@@ -14,6 +16,7 @@ import com.google.actions.api.response.ResponseBuilder;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -31,14 +34,30 @@ public class SmartDeviceService extends DialogflowApp {
 
     public String getAccelerateStatString(Request request) throws ParseException {
         List<Record> records;
+        Map<Build, List<Commit>> leadTimeRecords;
         String out = "Stat not recognized";
         DecimalFormat df = new DecimalFormat("0.00");
         if(request.getStatRequested().equalsIgnoreCase("Lead Time")){
-            records = smartDeviceInterface.getLeadTimeRecords(request);
-            if (records == null)
+            leadTimeRecords = smartDeviceInterface.getLeadTimeRecords(request);
+            if (leadTimeRecords == null)
                 out = "Team Does Not Exist.";
             else {
-            // TODO
+                SimpleDateFormat buildSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+                SimpleDateFormat commitSdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                float buildTime;
+                float commitTime;
+                float totalLeadTime = 0;
+                int c = 0;
+                for(Build build : leadTimeRecords.keySet()){
+                    buildTime = buildSdf.parse(build.getDate()).getTime();
+                    for(Commit commit : leadTimeRecords.get(build)){
+                        commitTime = commitSdf.parse(commit.getDate()).getTime();
+                        totalLeadTime += buildTime - commitTime;
+                        c += 1;
+                    }
+                }
+                float averageLeadTime = totalLeadTime / c / (1000 * 60 * 60);
+                out = "Average Lead Time since " + request.getStartDate() + " is: " + averageLeadTime + " hours.";
             }
         }
         if(request.getStatRequested().equalsIgnoreCase("mean time to restore")){

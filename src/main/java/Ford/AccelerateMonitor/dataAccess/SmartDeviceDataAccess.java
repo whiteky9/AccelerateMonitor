@@ -13,10 +13,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Repository("SmartDeviceDataAccess")
 public class SmartDeviceDataAccess implements SmartDeviceInterface{
@@ -35,9 +32,9 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
     }
 
     @Override
-    public List<Record> getLeadTimeRecords(Request request) {
+    public Map<Build,List<Commit>> getLeadTimeRecords(Request request) {
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
-        List<Record> records = new ArrayList<>();
+        Map<Build, List<Commit>> records = new HashMap<>();
         if(request.getTargetProject() != null){
             records = getLeadTimeRecordsByProject(records, request, DB);
         }
@@ -167,9 +164,89 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
     // helper functions
     //
     // Gets list of incident records
-    private List<Record> getLeadTimeRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
+    private Map<Build,List<Commit>> getLeadTimeRecordsByProject(Map<Build,List<Commit>> records, Request request, FirebaseDatabase DB){
         DatabaseReference commitsRef = DB.getReference("records/commits");
-        //TODO
+        DatabaseReference buildsRef = DB.getReference("records/builds");
+        final Boolean[] complete = {false};
+        Date requestDate = request.getStartDate();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        Map<String, Build> builds = new HashMap<>();
+        // find relevant build records
+        buildsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()) {
+                    Build record = child.getValue(Build.class);
+                    Date recordDate = null;
+                    Date firstDate = null;
+                    try {
+                        recordDate = sdf.parse(record.getDate());
+                    } catch (ParseException e) {
+
+                    }
+                    // if the build was successfully deployed to production, and is in the requested date range...
+                    if (recordDate.after(requestDate) && request.getTargetProject().equals(record.getProjectName()) && record.getDeployment() && record.getStatus().equals("SUCCESS") && record.getEnv().equalsIgnoreCase("PROD")) {
+                        // ...and if the sha is unique...
+                        if (!builds.containsKey(record.getCommitID())) {
+                            builds.put(record.getCommitID(), record);
+                        }
+                        else{
+                            try {
+                                firstDate = sdf.parse(builds.get(record.getCommitID()).getDate());
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            // ...or occurred before the previously recorded build, then store it.
+                            if(recordDate.before(firstDate)){
+                                builds.put(record.getCommitID(), record);
+                            }
+                        }
+                    }
+                }
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+        complete[0] = false;
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        for(Build build : builds.values()){
+            records.put(build, new ArrayList<>());
+        }
+        // find relevant commit records
+        commitsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()){
+                    Commit record = child.getValue(Commit.class);
+                    Date recordDate = null;
+                    try {
+                        recordDate = sdf1.parse(record.getDate());
+                    } catch (ParseException e) {
+
+                    }
+                    if(recordDate.after(requestDate) && request.getTargetProject().equals(record.getProjectName())) {
+                        for(Build build : records.keySet()){
+                            if(build.getCommitID().equals(record.getSha()))
+                                ///////// HERE PROLLY
+                                records.get(build).add(record);
+                        }
+                    }
+                }
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+
         return records;
     }
 

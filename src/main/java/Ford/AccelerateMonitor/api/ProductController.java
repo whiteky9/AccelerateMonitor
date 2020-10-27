@@ -27,7 +27,7 @@ public class ProductController {
 
     @PostMapping("/addGithubProduct")
     public void registerGithub(@RequestBody Github github) throws IOException, InterruptedException, ParseException {
-        github.getInitialCommitData();
+        github.getAllCommitData();
         productService.addGithub(github);
     }
 }

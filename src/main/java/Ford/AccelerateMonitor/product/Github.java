@@ -75,7 +75,7 @@ public class Github extends Product{
         return ApiUrl;
     }
 
-    public void getInitialCommitData() throws IOException, InterruptedException, ParseException {
+    public void getAllCommitData() throws IOException, InterruptedException, ParseException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request;
         // if public repo
@@ -92,19 +92,20 @@ public class Github extends Product{
 
         List<GitHub> commits = mapper.readValue(response.body(), new TypeReference<List<GitHub>>() {});
 
-        GitHub last = commits.get(commits.size() - 1);
+        for(int i=0; i<commits.size(); i++) {
+            GitHub last = commits.get(i);
+            Map<String, String> dataMap = new HashMap<String, String>();
+            dataMap.put("node_id", last.getNode_id());
+            String date = last.getCommit().path("author").path("date").asText();
+            String author = last.getCommit().path("author").path("name").asText();
+            String sha = last.getSha();
+            dataMap.put("date", date);
+            dataMap.put("name", author);
 
-        Map<String, String> dataMap = new HashMap<String, String>();
-        dataMap.put("node_id", last.getNode_id());
-        String date = last.getCommit().path("author").path("date").asText();
-        String author = last.getCommit().path("author").path("name").asText();
-        String sha = last.getSha();
-        dataMap.put("date", date);
-        dataMap.put("name", author);
+            Record record = new Commit(date, this.projectName, author, sha);
 
-        Record record = new Commit(date, this.projectName, author, sha);
-
-        getRecordsService().addRecord(record);
+            getRecordsService().addRecord(record);
+        }
     }
 
     private String url;
