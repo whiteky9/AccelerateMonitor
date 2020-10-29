@@ -137,6 +137,16 @@ public class SmartDeviceService extends DialogflowApp {
                 out = deploys + " build(s) since " + request.getStartDate().toString() + ".";
             }
         }
+        if(request.getStatRequested().equalsIgnoreCase("Commits")){
+            records = smartDeviceInterface.getCommitRecords(request);
+            if (records == null)
+                out = "Team Does Not Exist.";
+            else {
+                int commits = records.size();
+                out = commits + " commit(s) since " + request.getStartDate().toString() + ".";
+            }
+        }
+
 
         return out;
     }
@@ -161,6 +171,8 @@ public class SmartDeviceService extends DialogflowApp {
                 ints.add(smartDeviceInterface.getChangeFailPercentageRecords(request).size());*/
             else if(request.getStatRequested().equals("Builds Executed"))
                 ints.add((smartDeviceInterface.getBuildRecords(request)).size());
+            else if(request.getStatRequested().equals("Commits"))
+                ints.add(smartDeviceInterface.getCommitRecords(request).size());
 
             else
                 ints.add(-1);

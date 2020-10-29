@@ -160,6 +160,33 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         return records;
     }
 
+    @Override
+    public List<Record> getCommitRecords(Request request){
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
+        List<Record> records = new ArrayList<>();
+        // query by project
+        if(request.getTargetProject() != null){
+            records = getCommitRecordsByProject(records, request, DB);
+        }
+        // query by team
+        else if(request.getTargetTeam() != null){
+            List<String> projects = getProjectNamesByTeamName(request, DB);
+            if (projects == null)
+                records = null;
+            else {
+                for (int i = 0; i < projects.size(); i++) {
+                    request.setTargetProject(projects.get(i));
+                    records = getCommitRecordsByProject(records, request, DB);
+                }
+            }
+            request.setTargetProject(null);
+        }
+        else{
+            // error
+        }
+        return records;
+    }
+
     //
     // helper functions
     //
@@ -357,6 +384,39 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot child: dataSnapshot.getChildren()){
                     Build record = child.getValue(Build.class);
+                    Date recordDate = null;
+                    try {
+                        recordDate = sdf.parse(record.getDate());
+                    } catch (ParseException e) {
+
+                    }
+                    if(recordDate.after(requestDate) && recordDate.before(request.getEndDate()) && request.getTargetProject().equalsIgnoreCase(record.getProjectName())) {
+                        records.add(record);
+                    }
+                }
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+        return records;
+    }
+
+    //
+    List<Record> getCommitRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
+        DatabaseReference commitsRef = DB.getReference("records/commits");
+        Date requestDate = request.getStartDate();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        final Boolean[] complete = {false};
+        commitsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()){
+                    Commit record = child.getValue(Commit.class);
                     Date recordDate = null;
                     try {
                         recordDate = sdf.parse(record.getDate());
