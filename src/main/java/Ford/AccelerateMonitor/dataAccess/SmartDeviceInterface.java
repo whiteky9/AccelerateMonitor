@@ -11,7 +11,7 @@ import java.util.Map;
 
 // Interface to allow easy implementation of additional data sources.
 public interface SmartDeviceInterface {
-    Map<Build,List<Commit>> getLeadTimeRecords(Request request);
+    Map<Commit,Build> getLeadTimeRecords(Request request);
     List<Record> getMTTRRecords(Request request);
     List<Record> getDeploymentFrequencyRecords(Request request) throws ParseException;
     List<Record> getChangeFailPercentageRecords(Request request);

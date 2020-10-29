@@ -35,7 +35,7 @@ public class SmartDeviceService extends DialogflowApp {
 
     public String getAccelerateStatString(Request request) throws ParseException {
         List<Record> records;
-        Map<Build, List<Commit>> leadTimeRecords;
+        Map<Commit,Build> leadTimeRecords;
         String out = "Stat not recognized";
         DecimalFormat df = new DecimalFormat("0.00");
         if(request.getStatRequested().equalsIgnoreCase("Lead Time")){
@@ -49,13 +49,14 @@ public class SmartDeviceService extends DialogflowApp {
                 float commitTime;
                 float totalLeadTime = 0;
                 int c = 0;
-                for(Build build : leadTimeRecords.keySet()){
+                for(Commit commit: leadTimeRecords.keySet()){
+                    Build build = leadTimeRecords.get(commit);
+                    if(build == null)
+                        continue; // commits have not been deployed to production yet
+                    commitTime = commitSdf.parse(commit.getDate()).getTime();
                     buildTime = buildSdf.parse(build.getDate()).getTime();
-                    for(Commit commit : leadTimeRecords.get(build)){
-                        commitTime = commitSdf.parse(commit.getDate()).getTime();
-                        totalLeadTime += buildTime - commitTime;
-                        c += 1;
-                    }
+                    totalLeadTime += buildTime - commitTime;
+                    c += 1;
                 }
                 float averageLeadTime = totalLeadTime / c / (1000 * 60 * 60);
                 out = "Average Lead Time since " + request.getStartDate() + " is: " + averageLeadTime + " hours.";
@@ -163,7 +164,7 @@ public class SmartDeviceService extends DialogflowApp {
             request.setEndDateSame(String.format("%02d",month+1) + " " + String.format("%02d",i+1) + " " + year);
             /*if(request.getStatRequested().equals("Lead Time"))
                 ints.add(smartDeviceInterface.getLeadTimeRecords(request).size());
-            else if(request.getStatRequested().equals("Mean Time To Restore"))
+            else if(request.getStatRequested().equals("Mean Time To Restore"))                  not yet implemented
                 ints.add(smartDeviceInterface.getMTTRRecords(request).size());
             else*/ if(request.getStatRequested().equals("Deployment Frequency"))
                 ints.add(smartDeviceInterface.getDeploymentFrequencyRecords(request).size());

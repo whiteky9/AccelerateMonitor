@@ -32,9 +32,9 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
     }
 
     @Override
-    public Map<Build,List<Commit>> getLeadTimeRecords(Request request) {
+    public Map<Commit,Build> getLeadTimeRecords(Request request) {
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
-        Map<Build, List<Commit>> records = new HashMap<>();
+        Map<Commit,Build> records = new HashMap<>();
         if(request.getTargetProject() != null){
             records = getLeadTimeRecordsByProject(records, request, DB);
         }
@@ -191,59 +191,12 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
     // helper functions
     //
     // Gets list of incident records
-    private Map<Build,List<Commit>> getLeadTimeRecordsByProject(Map<Build,List<Commit>> records, Request request, FirebaseDatabase DB){
+    private Map<Commit,Build> getLeadTimeRecordsByProject(Map<Commit,Build> records, Request request, FirebaseDatabase DB){
         DatabaseReference commitsRef = DB.getReference("records/commits");
         DatabaseReference buildsRef = DB.getReference("records/builds");
         final Boolean[] complete = {false};
         Date requestDate = request.getStartDate();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-        Map<String, Build> builds = new HashMap<>();
-        // find relevant build records
-        buildsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot child: dataSnapshot.getChildren()) {
-                    Build record = child.getValue(Build.class);
-                    Date recordDate = null;
-                    Date firstDate = null;
-                    try {
-                        recordDate = sdf.parse(record.getDate());
-                    } catch (ParseException e) {
-
-                    }
-                    // if the build was successfully deployed to production, and is in the requested date range...
-                    if (recordDate.after(requestDate) && recordDate.before(request.getEndDate()) && request.getTargetProject().equals(record.getProjectName()) && record.getDeployment() && record.getStatus().equals("SUCCESS") && record.getEnv().equalsIgnoreCase("PROD")) {
-                        // ...and if the sha is unique...
-                        if (!builds.containsKey(record.getCommitID())) {
-                            builds.put(record.getCommitID(), record);
-                        }
-                        else{
-                            try {
-                                firstDate = sdf.parse(builds.get(record.getCommitID()).getDate());
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                            // ...or occurred before the previously recorded build, then store it.
-                            if(recordDate.before(firstDate)){
-                                builds.put(record.getCommitID(), record);
-                            }
-                        }
-                    }
-                }
-                complete[0] = true;
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-        while(!complete[0]){}
-        complete[0] = false;
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        for(Build build : builds.values()){
-            records.put(build, new ArrayList<>());
-        }
         // find relevant commit records
         commitsRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -257,9 +210,57 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
 
                     }
                     if(recordDate.after(requestDate) && recordDate.before(request.getEndDate()) && request.getTargetProject().equals(record.getProjectName())) {
-                        for(Build build : records.keySet()){
-                            if(build.getCommitID().equals(record.getSha()))
-                                records.get(build).add(record);
+                        records.put(record, null);
+                        //for(Build build : records.keySet()){
+                        //    if(build.getCommitID().equals(record.getSha()))
+                        //        records.get(build).add(record);
+                        //}
+                    }
+                }
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+        complete[0] = false;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        Map<String, Build> builds = new HashMap<>();
+        // find relevant build records
+        buildsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()) {
+                    Build build = child.getValue(Build.class);
+                    Date buildDate = null;
+                    Date firstDate = null;
+                    try {
+                        buildDate = sdf.parse(build.getDate());
+                    } catch (ParseException e) {
+
+                    }
+                    // if the build was successfully deployed to production, and is in the requested date range...
+                    if (buildDate.after(requestDate) && buildDate.before(request.getEndDate()) && request.getTargetProject().equals(build.getProjectName()) && build.getDeployment() && build.getStatus().equals("SUCCESS") && build.getEnv().equalsIgnoreCase("PROD")) {
+                        for(Commit commit : records.keySet()){
+                            // ...and if the sha matches one of the commits...
+                            if (commit.getSha().equals(build.getCommitID())) {
+                                // ... and there are no other corresponding builds...
+                                if (records.get(commit) == null)
+                                    records.put(commit, build);
+                                /// ...or the other build occured after this one, then store the build in the map.
+                                else{
+                                    try {
+                                        firstDate = sdf.parse(records.get(commit).getDate());
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+                                    if(buildDate.before(firstDate))
+                                        records.put(commit,build);
+                                }
+                            }
                         }
                     }
                 }
