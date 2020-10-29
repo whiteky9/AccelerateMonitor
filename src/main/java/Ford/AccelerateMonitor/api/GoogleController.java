@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = {"http://localhost:8081", "http://35.9.22.64:8888/"})
@@ -39,5 +40,8 @@ public class GoogleController {
 
     @PostMapping("/accelerate")
     public String getAccelerateRest(@RequestBody Request request) throws ParseException { return smartDeviceService.getAccelerateStatString(request); }
+
+    @PostMapping("/display")
+    public List<Integer> getAccelerateDisplay(@RequestBody Request request) throws ParseException { return smartDeviceService.getAccelerateStatList(request); }
 
 }

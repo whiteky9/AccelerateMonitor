@@ -10,20 +10,20 @@ import java.util.Date;
 
 public class Request {
 
-    public Request(String statRequested, String targetTeam, String targetProject, String startDate/*,String endDate*/) throws ParseException {
+    public Request(String statRequested, String targetTeam, String targetProject, String startDate,String endDate) throws ParseException {
         this.statRequested = statRequested;
         this.targetTeam = targetTeam;
         this.targetProject = targetProject;
         SimpleDateFormat sdf = new SimpleDateFormat("MM dd yyyy");
         this.startDate = sdf.parse(startDate);
-        //this.endDate = endDate;//TODO add later?
+        this.endDate = sdf.parse(endDate);
     }
 
     public Request(){
         this.statRequested = null;
         this.targetTeam = null;
         this.startDate = null;
-        //this.endDate = null;
+        this.endDate = new Date(System.currentTimeMillis());
     }
 
     public Request(String body) throws JSONException, ParseException {
@@ -49,6 +49,7 @@ public class Request {
         DateFormat dest = new SimpleDateFormat("MM dd yyyy");
         startDateString = dest.format(date);
         this.setStartDate(startDateString);
+        this.endDate = new Date(System.currentTimeMillis());
     }
 
 
@@ -83,18 +84,23 @@ public class Request {
         this.startDate = sdf.parse(startDate);
     }
 
-    /*public Date getEndDate() {
+    public Date getEndDate() {
         return endDate;
     }
 
     public void setEndDate(String endDate) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("MM dd yyyy");
         this.endDate = sdf.parse(endDate);
-    }*/
+    }
+
+    public void setEndDateSame(String endDate) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM dd yyyyHH:mm:ss");
+        this.endDate = sdf.parse(endDate + "23:59:59");
+    }
 
     private String statRequested;
     private String targetTeam;
     private String targetProject;
     private Date startDate;
-    //private Date endDate;
+    private Date endDate;
 }

@@ -185,7 +185,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
 
                     }
                     // if the build was successfully deployed to production, and is in the requested date range...
-                    if (recordDate.after(requestDate) && request.getTargetProject().equals(record.getProjectName()) && record.getDeployment() && record.getStatus().equals("SUCCESS") && record.getEnv().equalsIgnoreCase("PROD")) {
+                    if (recordDate.after(requestDate) && recordDate.before(request.getEndDate()) && request.getTargetProject().equals(record.getProjectName()) && record.getDeployment() && record.getStatus().equals("SUCCESS") && record.getEnv().equalsIgnoreCase("PROD")) {
                         // ...and if the sha is unique...
                         if (!builds.containsKey(record.getCommitID())) {
                             builds.put(record.getCommitID(), record);
@@ -229,10 +229,9 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                     } catch (ParseException e) {
 
                     }
-                    if(recordDate.after(requestDate) && request.getTargetProject().equals(record.getProjectName())) {
+                    if(recordDate.after(requestDate) && recordDate.before(request.getEndDate()) && request.getTargetProject().equals(record.getProjectName())) {
                         for(Build build : records.keySet()){
                             if(build.getCommitID().equals(record.getSha()))
-                                ///////// HERE PROLLY
                                 records.get(build).add(record);
                         }
                     }
@@ -298,7 +297,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                     } catch (ParseException e) {
 
                     }
-                    if(recordDate.after(requestDate) && record.getDeployment() && request.getTargetProject().equals(record.getProjectName())) {
+                    if(recordDate.after(requestDate) && recordDate.before(request.getEndDate()) && record.getDeployment() && request.getTargetProject().equals(record.getProjectName())) {
                         records.add(record);
                     }
                 }
@@ -331,7 +330,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                     } catch (ParseException e) {
 
                     }
-                    if(recordDate.after(requestDate) && record.getDeployment() && request.getTargetProject().equals(record.getProjectName())) {
+                    if(recordDate.after(requestDate) && recordDate.before(request.getEndDate()) && record.getDeployment() && request.getTargetProject().equals(record.getProjectName())) {
                         records.add(record);
                     }
                 }
@@ -364,7 +363,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                     } catch (ParseException e) {
 
                     }
-                    if(recordDate.after(requestDate) && request.getTargetProject().equalsIgnoreCase(record.getProjectName())) {
+                    if(recordDate.after(requestDate) && recordDate.before(request.getEndDate()) && request.getTargetProject().equalsIgnoreCase(record.getProjectName())) {
                         records.add(record);
                     }
                 }

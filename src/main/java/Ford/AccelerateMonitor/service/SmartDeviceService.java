@@ -25,6 +25,7 @@ import java.util.*;
 
 @Service
 public class SmartDeviceService extends DialogflowApp {
+    static Integer[] DAYSINMONTHS = new Integer[]{31,29,31,30,31,30,31,31,30,31,30,31};
 
     private final SmartDeviceInterface smartDeviceInterface;
     private org.slf4j.Logger logger = LoggerFactory.getLogger(GoogleController.class);
@@ -138,6 +139,34 @@ public class SmartDeviceService extends DialogflowApp {
         }
 
         return out;
+    }
+
+    public List<Integer> getAccelerateStatList(Request request) throws ParseException {
+        List<Integer> ints = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(request.getStartDate());
+        Integer month = calendar.get(Calendar.MONTH);
+        Integer year = calendar.get(Calendar.YEAR);
+
+        for(int i=0; i<DAYSINMONTHS[month]; i++){
+            request.setStartDate(String.format("%02d",month+1) + " " + String.format("%02d",i+1) + " " + year);
+            request.setEndDateSame(String.format("%02d",month+1) + " " + String.format("%02d",i+1) + " " + year);
+            /*if(request.getStatRequested().equals("Lead Time"))
+                ints.add(smartDeviceInterface.getLeadTimeRecords(request).size());
+            else if(request.getStatRequested().equals("Mean Time To Restore"))
+                ints.add(smartDeviceInterface.getMTTRRecords(request).size());
+            else*/ if(request.getStatRequested().equals("Deployment Frequency"))
+                ints.add(smartDeviceInterface.getDeploymentFrequencyRecords(request).size());
+            /*else if(request.getStatRequested().equals("Change Fail Percentage"))
+                ints.add(smartDeviceInterface.getChangeFailPercentageRecords(request).size());*/
+            else if(request.getStatRequested().equals("Builds Executed"))
+                ints.add((smartDeviceInterface.getBuildRecords(request)).size());
+
+            else
+                ints.add(-1);
+        }
+
+        return ints;
     }
 
     public WebhookResponse getAccelerateStatWebhook(Request request) throws ParseException {
