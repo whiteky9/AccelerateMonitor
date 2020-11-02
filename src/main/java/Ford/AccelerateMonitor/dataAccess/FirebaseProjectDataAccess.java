@@ -73,7 +73,7 @@ public class FirebaseProjectDataAccess implements ProjectInterface{
     }
 
     @Override
-    public Project getProject(String id){
+    public Project getProjectById(String id){
         //creates reference to project list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference getProjectRef = DB.getReference("projects");
@@ -81,6 +81,45 @@ public class FirebaseProjectDataAccess implements ProjectInterface{
         final boolean[] complete = {false};
 
         getProjectRef.orderByChild("id").equalTo(id).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                projects.add(dataSnapshot.getValue(Project.class));
+                complete[0] = true;
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+        return projects.get(0);
+    }
+
+    @Override
+    public Project getProjectByName(String name){
+        //creates reference to project list in database
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
+        DatabaseReference getProjectRef = DB.getReference("projects");
+        List<Project> projects = new ArrayList<>();
+        final boolean[] complete = {false};
+
+        getProjectRef.orderByChild("name").equalTo(name).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 projects.add(dataSnapshot.getValue(Project.class));
