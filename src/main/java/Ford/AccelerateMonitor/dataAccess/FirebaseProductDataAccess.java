@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Repository("productDataAccess")
 public class FirebaseProductDataAccess implements ProductInterface{
@@ -37,8 +39,10 @@ public class FirebaseProductDataAccess implements ProductInterface{
         DatabaseReference jenkinsRef = dataRef.child("products/jenkins");
 
         //pushes provided member into the database
-        DatabaseReference newRecordRef = jenkinsRef.push();
-        newRecordRef.setValueAsync(jenkins);
+        Map<String, Object> newJenkins = new HashMap<>();
+        String key = jenkins.getProjectName() + ':' + jenkins.getName();
+        newJenkins.put(key,jenkins);
+        jenkinsRef.setValueAsync(newJenkins);
     }
 
     @Override
@@ -49,8 +53,10 @@ public class FirebaseProductDataAccess implements ProductInterface{
         DatabaseReference githubRef = dataRef.child("products/github");
 
         //pushes provided member into the database
-        DatabaseReference newRecordRef = githubRef.push();
-        newRecordRef.setValueAsync(github);
+        Map<String, Object> newGithub = new HashMap<>();
+        String key = github.getProjectName() + ':' + github.getName();
+        newGithub.put(key,github);
+        githubRef.updateChildrenAsync(newGithub);
     }
 
     final private FirebaseApp app;
