@@ -20,10 +20,8 @@ public class TeamController {
         this.teamService = teamService;
     }
 
-
     @PostMapping("/addTeam")
     public void addTeam(@RequestBody Team team) { teamService.addTeam(team); }
-
 
     @GetMapping("/getAllTeams")
     public List<Team> getAllTeams() {
@@ -33,7 +31,7 @@ public class TeamController {
     @GetMapping(path = "/getTeam/{id}")
     public Team getTeamById(@PathVariable("id") String id){ return teamService.getTeamById(id); }
 
-    @GetMapping(path = "/getTeam/{name}")
+    @GetMapping(path = "/getTeamByName/{name}")
     public Team getTeamByName(@PathVariable("name") String name){ return teamService.getTeamByName(name); }
 
     @DeleteMapping(path = "/deleteTeam/{id}")

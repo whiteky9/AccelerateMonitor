@@ -7,7 +7,8 @@ import java.util.List;
 public interface TeamInterface {
     void insertTeam(Team team);
     List<Team> getAllTeams();
-    Team getTeam(String id);
+    Team getTeamById(String id);
+    Team getTeamByName(String name);
     void deleteTeam(String id);
     void updateTeam(String id, Team team);
     void addMember(String id, String member);
