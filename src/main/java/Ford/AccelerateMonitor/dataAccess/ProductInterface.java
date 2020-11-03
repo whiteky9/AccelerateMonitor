@@ -7,4 +7,7 @@ public interface ProductInterface {
 
     void addJenkinsServer(Jenkins jenkins);
     void addGithub(Github github);
+
+    Object getGithubProduct(String name);
+    Object getJenkinsProduct(String name);
 }

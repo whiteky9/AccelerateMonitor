@@ -30,4 +30,11 @@ public class ProductController {
         github.getAllCommitData();
         productService.addGithub(github);
     }
+
+    @GetMapping("/getGithubProduct/{name}")
+    public Object getGithubProduct(@PathVariable("name") String name){ return productService.getGithubProduct(name); }
+
+    @GetMapping("/getJenkinsProduct/{name}")
+    public Object getJenkinsProduct(@PathVariable("name") String name){ return productService.getJenkinsProduct(name); }
+
 }
