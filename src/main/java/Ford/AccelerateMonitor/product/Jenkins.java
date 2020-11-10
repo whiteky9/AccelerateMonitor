@@ -5,6 +5,7 @@ import Ford.AccelerateMonitor.model.Build;
 import Ford.AccelerateMonitor.model.Record;
 import Ford.AccelerateMonitor.service.RecordsService;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.api.client.json.Json;
 
 import java.text.ParseException;
 import java.time.Instant;
@@ -27,14 +28,19 @@ public class Jenkins extends Product {
      * @param jobName name of Jenkins job
      * @param userName Jenkins username for authentication
      * @param token auth token generated from Jenkins
+     * @param projectName project name registered in portal
+     * @param env environment associated with this job
      * */
     public Jenkins(
             String url, String jobName,
-            String userName, String token) {
+            String userName, String token,
+            String projectName, String env) {
         super(jobName);
         this.url = url;
         this.userName = userName;
         this.token = token;
+        this.projectName = projectName;
+        this.env = env;
     }
 
     /** Default Constructor
@@ -95,9 +101,9 @@ public class Jenkins extends Product {
 
     private String token;
 
-    private String env = "PROD"; // UNDER ASSUMPTION EACH PIPELINE IS FOR SPECIFIC ENVIRONMENT
+    private String env; // UNDER ASSUMPTION EACH PIPELINE IS FOR SPECIFIC ENVIRONMENT
 
-    private String projectName = "jenkins-test"; // WILL GET THIS INFORMATION FROM PROJECT INSTANCE
+    private String projectName;
 
     private String getJobUrl()
     {
@@ -166,9 +172,21 @@ public class Jenkins extends Product {
             String formatted = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z"));
 
             // GET DEPLOY BOOL - not implemented
+            Boolean deployBool = false;
+            JsonNode paramArray = buildData.findValue("parameters");
+
+            if (paramArray != null) {
+                for (final JsonNode paramObj : paramArray) {
+                    JsonNode nameNode = paramObj.get("name");
+                    if (nameNode.asText().equals("Deploy")) {
+                        deployBool = paramObj.get("value").asBoolean();
+                    }
+
+                }
+            }
 
             // CREATE RECORD
-            Record record = new Build(projectName, formatted, commitID, result, true, env);
+            Record record = new Build(projectName, formatted, commitID, result, deployBool, env);
             getRecordsService().addRecord(record);
 
 
