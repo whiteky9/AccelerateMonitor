@@ -115,6 +115,10 @@ public class SmartDeviceService extends DialogflowApp {
         if(request.getStatRequested().equalsIgnoreCase("Change Fail Percentage")){
             records = smartDeviceInterface.getChangeFailPercentageRecords(request);
             //calculate and set to out
+            if (records == null)
+                out = "Team Does Not Exist.";
+            else
+                out = "Change Fail Percentage = " + df.format(changeFail(records));
         }
         if(request.getStatRequested().equalsIgnoreCase("Builds Executed")){
             records = smartDeviceInterface.getBuildRecords(request);
@@ -169,8 +173,8 @@ public class SmartDeviceService extends DialogflowApp {
                 ints.add(leadTime(smartDeviceInterface.getLeadTimeRecords(request)));
             else if (request.getStatRequested().equals("Mean Time To Restore"))
                 ints.add(mttr(smartDeviceInterface.getMTTRRecords(request)));
-            /*else if (request.getStatRequested().equals("Change Fail Percentage"))
-                ints.add(smartDeviceInterface.getChangeFailPercentageRecords(request).size());*/
+            else if (request.getStatRequested().equals("Change Fail Percentage"))
+                ints.add((float) changeFail(smartDeviceInterface.getChangeFailPercentageRecords(request)));
         }
         else
             ints.add(null);
@@ -254,4 +258,52 @@ public class SmartDeviceService extends DialogflowApp {
             mttr = sum/pairCount/60;
         return mttr;
     }
+
+    private double changeFail(List<Record> records) {
+
+        double successCommits = 0;
+        double repeats = 0;
+        double failed = 0;
+
+        List<String> commitIDs = new ArrayList<>();
+        Map<String, Integer> history = new HashMap<>();
+
+        for (Record record : records) {
+            commitIDs.add(record.getCommitID());
+            if (record.getStatus().equals("SUCCESS")) {
+                successCommits += 1;
+            }
+        }
+
+        for (int x = 0; x < commitIDs.size(); x++) {
+            if (!history.containsKey(commitIDs.get(x))) {
+                history.put(commitIDs.get(x), 1);
+            }
+            else {
+                repeats += 1;
+                int first = commitIDs.indexOf(commitIDs.get(x));
+                failed += (x - first - 1);
+            }
+        }
+
+        return failed / (successCommits - repeats);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
