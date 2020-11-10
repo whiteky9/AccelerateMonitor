@@ -76,50 +76,55 @@ public class Github extends Product{
         return ApiUrl;
     }
 
-    public void getAllCommitData() throws IOException, InterruptedException, ParseException {
+    public String getAllCommitData() throws IOException, InterruptedException, ParseException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request;
         String apiUrl = constructApiUrl(this.url);
+        String status = "Incomplete";
         boolean[] complete = {false};
         int c = 1;
         while(!complete[0]) {
-
             request = HttpRequest.newBuilder()
                     .GET()
                     .header("accept", "application/json")
                     .header("Authorization", "token " + token)
                     .uri(URI.create(apiUrl))
                     .build();
-            //}
+
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if(response.statusCode() == 401){
+                status = "Bad Access Token.";
+                break;
+            } else {
+                ObjectMapper mapper = new ObjectMapper();
 
-            ObjectMapper mapper = new ObjectMapper();
+                List<GitHub> commits = mapper.readValue(response.body(), new TypeReference<List<GitHub>>() {
+                });
 
-            List<GitHub> commits = mapper.readValue(response.body(), new TypeReference<List<GitHub>>() {
-            });
-            System.out.println(commits.size());
+                for (int i = 0; i < commits.size(); i++) {
+                    GitHub last = commits.get(i);
+                    Map<String, String> dataMap = new HashMap<String, String>();
+                    dataMap.put("node_id", last.getNode_id());
+                    String date = last.getCommit().path("author").path("date").asText();
+                    String author = last.getCommit().path("author").path("name").asText();
+                    String sha = last.getSha();
+                    dataMap.put("date", date);
+                    dataMap.put("name", author);
 
-            for (int i = 0; i < commits.size(); i++) {
-                GitHub last = commits.get(i);
-                Map<String, String> dataMap = new HashMap<String, String>();
-                dataMap.put("node_id", last.getNode_id());
-                String date = last.getCommit().path("author").path("date").asText();
-                String author = last.getCommit().path("author").path("name").asText();
-                String sha = last.getSha();
-                dataMap.put("date", date);
-                dataMap.put("name", author);
+                    Record record = new Commit(date, this.projectName, author, sha);
 
-                Record record = new Commit(date, this.projectName, author, sha);
-
-                getRecordsService().addRecord(record);
+                    getRecordsService().addRecord(record);
+                }
+                c += 1;
+                if (commits.size() < 100)
+                    complete[0] = true;
+                else
+                    apiUrl = apiUrl.substring(0, apiUrl.length() - digits(c)) + c;
             }
-            c += 1;
-            if(commits.size() < 100)
-                complete[0] = true;
-            else
-                apiUrl = apiUrl.substring(0,apiUrl.length()-digits(c)) + c;
+            status = "Success";
         }
+        return status;
     }
 
     private int digits(int i){
