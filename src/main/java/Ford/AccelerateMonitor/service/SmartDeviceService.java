@@ -43,30 +43,17 @@ public class SmartDeviceService extends DialogflowApp {
             if (leadTimeRecords == null)
                 out = "Team Does Not Exist.";
             else {
-                SimpleDateFormat buildSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-                SimpleDateFormat commitSdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                float buildTime;
-                float commitTime;
-                float totalLeadTime = 0;
-                int c = 0;
-                for(Commit commit: leadTimeRecords.keySet()){
-                    Build build = leadTimeRecords.get(commit);
-                    if(build == null)
-                        continue; // commits have not been deployed to production yet
-                    commitTime = commitSdf.parse(commit.getDate()).getTime();
-                    buildTime = buildSdf.parse(build.getDate()).getTime();
-                    totalLeadTime += buildTime - commitTime;
-                    c += 1;
-                }
-                float averageLeadTime = totalLeadTime / c / (1000 * 60 * 60);
-                out = "Average Lead Time since " + request.getStartDate() + " is: " + averageLeadTime + " hours.";
+                float averageLeadTime = leadTime(leadTimeRecords);
+                out = "Average Lead Time since " + request.getStartDate() + " is: " + df.format(averageLeadTime) + " hours.";
             }
         }
+
         if(request.getStatRequested().equalsIgnoreCase("mean time to restore")){
             records = smartDeviceInterface.getMTTRRecords(request);
-
-            if (records.isEmpty())
-                out = "Team or Project Does Not Exist.";
+            if(records == null)
+                out = "Team Does Not Exist.";
+            else if (records.isEmpty())
+                out = "No Records Found for the Given Team/Project.";
             else {
                 // Match up records into pairs
                 int pairCount = 0;
@@ -152,32 +139,41 @@ public class SmartDeviceService extends DialogflowApp {
         return out;
     }
 
-    public List<Integer> getAccelerateStatList(Request request) throws ParseException {
-        List<Integer> ints = new ArrayList<>();
+    public List<Float> getAccelerateStatList(Request request) throws ParseException {
+        List<Float> ints = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(request.getStartDate());
         Integer month = calendar.get(Calendar.MONTH);
         Integer year = calendar.get(Calendar.YEAR);
+        Integer day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        for(int i=0; i<DAYSINMONTHS[month]; i++){
-            request.setStartDate(String.format("%02d",month+1) + " " + String.format("%02d",i+1) + " " + year);
-            request.setEndDateSame(String.format("%02d",month+1) + " " + String.format("%02d",i+1) + " " + year);
-            /*if(request.getStatRequested().equals("Lead Time"))
-                ints.add(smartDeviceInterface.getLeadTimeRecords(request).size());
-            else if(request.getStatRequested().equals("Mean Time To Restore"))                  not yet implemented
-                ints.add(smartDeviceInterface.getMTTRRecords(request).size());
-            else*/ if(request.getStatRequested().equals("Deployment Frequency"))
-                ints.add(smartDeviceInterface.getDeploymentFrequencyRecords(request).size());
-            /*else if(request.getStatRequested().equals("Change Fail Percentage"))
-                ints.add(smartDeviceInterface.getChangeFailPercentageRecords(request).size());*/
-            else if(request.getStatRequested().equals("Builds Executed"))
-                ints.add((smartDeviceInterface.getBuildRecords(request)).size());
-            else if(request.getStatRequested().equals("Commits"))
-                ints.add(smartDeviceInterface.getCommitRecords(request).size());
-
-            else
-                ints.add(-1);
+        if(request.getStatRequested().equals("Deployment Frequency") || request.getStatRequested().equals("Builds Executed") || request.getStatRequested().equals("Commits")) {
+            for (int i = 0; i < DAYSINMONTHS[month]; i++) {
+                request.setStartDate(String.format("%02d", month + 1) + " " + String.format("%02d", i + 1) + " " + year);
+                request.setEndDateSame(String.format("%02d", month + 1) + " " + String.format("%02d", i + 1) + " " + year);
+                if (request.getStatRequested().equals("Deployment Frequency"))
+                    ints.add((float) smartDeviceInterface.getDeploymentFrequencyRecords(request).size());
+                else if (request.getStatRequested().equals("Builds Executed"))
+                    ints.add((float) (smartDeviceInterface.getBuildRecords(request)).size());
+                else if (request.getStatRequested().equals("Commits"))
+                    ints.add((float) smartDeviceInterface.getCommitRecords(request).size());
+            }
         }
+
+
+        else if(request.getStatRequested().equals("Mean Time To Restore") || request.getStatRequested().equals("Lead Time") || request.getStatRequested().equals("Change Fail Percentage")) {
+            request.setStartDate(String.format("%02d",month+1) + " " + String.format("%02d",day) + " " + year);
+            day += 6;
+            request.setEndDateSame(String.format("%02d",month+1) + " " + String.format("%02d",day) + " " + year);
+            if (request.getStatRequested().equals("Lead Time"))
+                ints.add(leadTime(smartDeviceInterface.getLeadTimeRecords(request)));
+            else if (request.getStatRequested().equals("Mean Time To Restore"))
+                ints.add(mttr(smartDeviceInterface.getMTTRRecords(request)));
+            /*else if (request.getStatRequested().equals("Change Fail Percentage"))
+                ints.add(smartDeviceInterface.getChangeFailPercentageRecords(request).size());*/
+        }
+        else
+            ints.add(null);
 
         return ints;
     }
@@ -188,5 +184,74 @@ public class SmartDeviceService extends DialogflowApp {
         ResponseBuilder responseBuilder = new ResponseBuilder().add(out);
         ActionResponse response = responseBuilder.build();
         return response.getWebhookResponse();
+    }
+
+    /**
+     * Statistic calculations
+     *
+     *
+     */
+    private float leadTime(Map<Commit,Build> leadTimeRecords) throws ParseException {
+        SimpleDateFormat buildSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        SimpleDateFormat commitSdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+        float buildTime;
+        float commitTime;
+        float totalLeadTime = 0;
+        int c = 0;
+        for(Commit commit: leadTimeRecords.keySet()){
+            Build build = leadTimeRecords.get(commit);
+            if(build == null)
+                continue; // commits have not been deployed to production yet
+            commitTime = commitSdf.parse(commit.getDate()).getTime();
+            buildTime = buildSdf.parse(build.getDate()).getTime();
+            totalLeadTime += buildTime - commitTime;
+            c += 1;
+        }
+        return totalLeadTime / c / (1000 * 60 * 60);
+    }
+
+    private float mttr(List<Record> records){
+        // Match up records into pairs
+        int pairCount = 0;
+        Long sum = new Long(0);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
+
+        HashMap<String, Record> tempMap = new HashMap<>();
+        Iterator<Record> recordIterator = records.iterator();
+        Record temp;
+        float mttr;
+
+        while (recordIterator.hasNext()) {
+
+            // Temporarily store record
+            temp = recordIterator.next();
+
+            // Assuming incident records are in order of time stamp (down record before restored record)
+            // Assuming when asking for MTTR by team, there may be more than one project
+            // Does NOT consider if there is a restored record with no matching down record
+            // Add every Down record to temporary hash map with project name as key
+            // Next Restored record with the same project name is a match
+            // For each pair calculate time to restore and add to sum
+            if (temp.getStatus().equals("Down")) {
+                tempMap.put(temp.getProjectName(), temp);
+            } else if (temp.getStatus().equals("Restored")) {
+
+                LocalDateTime downDate = LocalDateTime.parse(temp.getDate(), formatter);
+                LocalDateTime restoredDate = LocalDateTime.parse(tempMap.get(temp.getProjectName()).getDate(), formatter);
+
+                Duration duration = Duration.between(restoredDate, downDate);
+                Long durationSeconds = duration.getSeconds();
+                sum += durationSeconds;
+
+                pairCount++;
+
+                tempMap.remove(temp.getProjectName());
+            }
+        }
+        if(pairCount == 0)
+            mttr = 0;
+        else
+            mttr = sum/pairCount/60;
+        return mttr;
     }
 }

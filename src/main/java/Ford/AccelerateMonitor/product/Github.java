@@ -76,14 +76,6 @@ public class Github extends Product{
         return ApiUrl;
     }
 
-    /*private String getAuthString(){
-        return token;
-    }
-
-    private JsonNode retreiveData(String url) {
-        return super.retreiveData(constructApiUrl(url), getAuthString());
-    }*/
-
     public void getAllCommitData() throws IOException, InterruptedException, ParseException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request;
@@ -95,7 +87,7 @@ public class Github extends Product{
             request = HttpRequest.newBuilder()
                     .GET()
                     .header("accept", "application/json")
-                    .header("Authorization", "token a889deec8bcac779300ed12252c0a32978731162")
+                    .header("Authorization", "token " + token)
                     .uri(URI.create(apiUrl))
                     .build();
             //}

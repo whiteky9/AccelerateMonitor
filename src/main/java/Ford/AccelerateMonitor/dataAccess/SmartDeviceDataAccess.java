@@ -196,7 +196,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         DatabaseReference buildsRef = DB.getReference("records/builds");
         final Boolean[] complete = {false};
         Date requestDate = request.getStartDate();
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
         // find relevant commit records
         commitsRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -211,10 +211,6 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                     }
                     if(recordDate.after(requestDate) && recordDate.before(request.getEndDate()) && request.getTargetProject().equals(record.getProjectName())) {
                         records.put(record, null);
-                        //for(Build build : records.keySet()){
-                        //    if(build.getCommitID().equals(record.getSha()))
-                        //        records.get(build).add(record);
-                        //}
                     }
                 }
                 complete[0] = true;
@@ -293,7 +289,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                     } catch (ParseException e) {
 
                     }
-                    if(recordDate.after(requestDate) && request.getTargetProject().equals(record.getProjectName()))
+                    if(recordDate.after(requestDate) && recordDate.before(request.getEndDate()) && request.getTargetProject().equals(record.getProjectName()))
                         records.add(record);
                 }
                 complete[0] = true;
@@ -411,7 +407,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
     List<Record> getCommitRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
         DatabaseReference commitsRef = DB.getReference("records/commits");
         Date requestDate = request.getStartDate();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
         final Boolean[] complete = {false};
         commitsRef.addValueEventListener(new ValueEventListener() {
             @Override

@@ -42,6 +42,5 @@ public class GoogleController {
     public String getAccelerateRest(@RequestBody Request request) throws ParseException { return smartDeviceService.getAccelerateStatString(request); }
 
     @PostMapping("/display")
-    public List<Integer> getAccelerateDisplay(@RequestBody Request request) throws ParseException { return smartDeviceService.getAccelerateStatList(request); }
-
+    public List<Float> getAccelerateDisplay(@RequestBody Request request) throws ParseException { return smartDeviceService.getAccelerateStatList(request); }
 }
