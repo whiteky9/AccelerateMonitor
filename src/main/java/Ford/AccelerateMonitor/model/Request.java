@@ -1,5 +1,6 @@
 package Ford.AccelerateMonitor.model;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,12 +31,14 @@ public class Request {
         JSONObject bodyJSON = new JSONObject(body);
         JSONObject queryResult = bodyJSON.getJSONObject("queryResult");
         JSONObject parameters = queryResult.getJSONObject("parameters");
-        String statRequested = parameters.get("statRequested").toString();
-        String targetTeam = parameters.get("targetTeam").toString();
+        String statRequested = parameters.get("statrequested").toString();
+        String targetTeamArray = parameters.get("targetteam").toString();
+        String targetTeam = targetTeamArray.substring(2, targetTeamArray.length()-2);
         targetTeam = targetTeam.substring(0,1).toUpperCase() + targetTeam.substring(1);
         String targetProject = parameters.get("targetProject").toString();
-        JSONObject datePeriod = parameters.getJSONObject("date-period");
-        String startDateString = datePeriod.get("startDate").toString();
+        JSONArray datePeriod = parameters.getJSONArray("date-period");
+        JSONObject datePeriodObject = (JSONObject) datePeriod.get(0);
+        String startDateString = datePeriodObject.get("startDate").toString();
         this.setStatRequested(statRequested);
         if(targetTeam.equals(""))
             this.setTargetTeam(null);
@@ -49,6 +52,7 @@ public class Request {
         Date date = source.parse(startDateString);
         DateFormat dest = new SimpleDateFormat("MM dd yyyy");
         startDateString = dest.format(date);
+        
         this.setStartDate(startDateString);
     }
 
