@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.google.actions.api.ActionResponse;
 import com.google.actions.api.response.ResponseBuilder;
 
+import javax.sound.midi.SysexMessage;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -114,6 +115,7 @@ public class SmartDeviceService extends DialogflowApp {
         }
         if(request.getStatRequested().equalsIgnoreCase("Change Fail Percentage")){
             records = smartDeviceInterface.getChangeFailPercentageRecords(request);
+
             //calculate and set to out
             if (records == null)
                 out = "Team Does Not Exist.";
@@ -150,8 +152,9 @@ public class SmartDeviceService extends DialogflowApp {
         Integer month = calendar.get(Calendar.MONTH);
         Integer year = calendar.get(Calendar.YEAR);
         Integer day = calendar.get(Calendar.DAY_OF_MONTH);
+        DecimalFormat df = new DecimalFormat("0.00");
 
-        if(request.getStatRequested().equals("Deployment Frequency") || request.getStatRequested().equals("Builds Executed") || request.getStatRequested().equals("Commits")) {
+        if(request.getStatRequested().equals("Deployment Frequency") || request.getStatRequested().equals("Lead Time") || request.getStatRequested().equals("Builds Executed") || request.getStatRequested().equals("Commits")) {
             for (int i = 0; i < DAYSINMONTHS[month]; i++) {
                 request.setStartDate(String.format("%02d", month + 1) + " " + String.format("%02d", i + 1) + " " + year);
                 request.setEndDateSame(String.format("%02d", month + 1) + " " + String.format("%02d", i + 1) + " " + year);
@@ -161,20 +164,37 @@ public class SmartDeviceService extends DialogflowApp {
                     ints.add((float) (smartDeviceInterface.getBuildRecords(request)).size());
                 else if (request.getStatRequested().equals("Commits"))
                     ints.add((float) smartDeviceInterface.getCommitRecords(request).size());
+                else if (request.getStatRequested().equals("Lead Time")) {
+                    Float lead = leadTime(smartDeviceInterface.getLeadTimeRecords(request));
+                    if (lead.toString() == "NaN")
+                        ints.add((float) 0.0);
+                    else {
+                        String d = df.format(lead.doubleValue());
+                        ints.add(Float.parseFloat(d));
+                    }
+                }
             }
         }
 
 
-        else if(request.getStatRequested().equals("Mean Time To Restore") || request.getStatRequested().equals("Lead Time") || request.getStatRequested().equals("Change Fail Percentage")) {
+        else if(request.getStatRequested().equals("Mean Time To Restore") ||  request.getStatRequested().equals("Change Fail Percentage")) {
             request.setStartDate(String.format("%02d",month+1) + " " + String.format("%02d",day) + " " + year);
-            day += 6;
+
+            if ((DAYSINMONTHS[month] - day) <= 6) {
+                day += DAYSINMONTHS[month] - day;
+            }
+            else {
+                day += 6;
+            }
+
             request.setEndDateSame(String.format("%02d",month+1) + " " + String.format("%02d",day) + " " + year);
             if (request.getStatRequested().equals("Lead Time"))
                 ints.add(leadTime(smartDeviceInterface.getLeadTimeRecords(request)));
             else if (request.getStatRequested().equals("Mean Time To Restore"))
                 ints.add(mttr(smartDeviceInterface.getMTTRRecords(request)));
-            else if (request.getStatRequested().equals("Change Fail Percentage"))
+            else if (request.getStatRequested().equals("Change Fail Percentage")) {
                 ints.add((float) changeFail(smartDeviceInterface.getChangeFailPercentageRecords(request)));
+            }
         }
         else
             ints.add(null);
