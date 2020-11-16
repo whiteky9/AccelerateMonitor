@@ -154,7 +154,7 @@ public class SmartDeviceService extends DialogflowApp {
         Integer day = calendar.get(Calendar.DAY_OF_MONTH);
         DecimalFormat df = new DecimalFormat("0.00");
 
-        if(request.getStatRequested().equals("Deployment Frequency") || request.getStatRequested().equals("Lead Time") || request.getStatRequested().equals("Builds Executed") || request.getStatRequested().equals("Commits")) {
+        if(request.getStatRequested().equals("Deployment Frequency") || request.getStatRequested().equals("Builds Executed") || request.getStatRequested().equals("Commits")) {
             for (int i = 0; i < DAYSINMONTHS[month]; i++) {
                 request.setStartDate(String.format("%02d", month + 1) + " " + String.format("%02d", i + 1) + " " + year);
                 request.setEndDateSame(String.format("%02d", month + 1) + " " + String.format("%02d", i + 1) + " " + year);
@@ -166,18 +166,16 @@ public class SmartDeviceService extends DialogflowApp {
                     ints.add((float) smartDeviceInterface.getCommitRecords(request).size());
                 else if (request.getStatRequested().equals("Lead Time")) {
                     Float lead = leadTime(smartDeviceInterface.getLeadTimeRecords(request));
-                    if (lead.toString() == "NaN")
-                        ints.add((float) 0.0);
-                    else {
-                        String d = df.format(lead.doubleValue());
-                        ints.add(Float.parseFloat(d));
-                    }
+
+                    String d = df.format(lead.doubleValue());
+                    ints.add(Float.parseFloat(d));
+
                 }
             }
         }
 
 
-        else if(request.getStatRequested().equals("Mean Time To Restore") ||  request.getStatRequested().equals("Change Fail Percentage")) {
+        else if(request.getStatRequested().equals("Mean Time To Restore") ||  request.getStatRequested().equals("Change Fail Percentage" ) || request.getStatRequested().equals("Lead Time")) {
             request.setStartDate(String.format("%02d",month+1) + " " + String.format("%02d",day) + " " + year);
 
             if ((DAYSINMONTHS[month] - day) <= 6) {
