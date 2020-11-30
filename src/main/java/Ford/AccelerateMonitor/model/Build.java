@@ -2,6 +2,17 @@ package Ford.AccelerateMonitor.model;
 
 public class Build extends Record{
 
+    public Build(String projectName, String date, String commitID, String status, Boolean deployment, String env,
+                 Boolean notification){
+        super(projectName, date);
+        this.commitID = commitID;
+        this.status = status;
+        this.deployment = deployment;
+        this.env = env;
+        this.notification = notification;
+
+    }
+
     public Build(String projectName, String date, String commitID, String status, Boolean deployment, String env){
         super(projectName, date);
         this.commitID = commitID;
@@ -9,12 +20,14 @@ public class Build extends Record{
         this.deployment = deployment;
         this.env = env;
     }
+
     public Build(){
         super();
         this.commitID = null;
         this.status = null;
         this.env = null;
         this.deployment = null;
+        this.notification = null;
     }
 
     public String getCommitID() {
@@ -50,8 +63,13 @@ public class Build extends Record{
         this.env = env;
     }
 
+    public Boolean getNotification() { return notification; }
+
+    public void setNotification(Boolean notification) { this.notification = notification; }
+
     private String commitID;
     private String status;
     private String env;
-    Boolean deployment;
+    private Boolean deployment;
+    private Boolean notification;
 }
