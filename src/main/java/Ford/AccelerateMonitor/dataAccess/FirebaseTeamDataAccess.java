@@ -75,7 +75,7 @@ public class FirebaseTeamDataAccess implements TeamInterface{
     }
 
     @Override
-    public Team getTeam(String id){
+    public Team getTeamById(String id){
         //creates reference to team list in database
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference getTeamRef = DB.getReference("teams");
@@ -112,6 +112,47 @@ public class FirebaseTeamDataAccess implements TeamInterface{
         while(!complete[0]){}
         return teams.get(0);
     }
+
+    @Override
+    public Team getTeamByName(String name){
+        //creates reference to team list in database
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
+        DatabaseReference getTeamRef = DB.getReference("teams");
+        List<Team> teams = new ArrayList<>();
+        final boolean[] complete = {false};
+
+        getTeamRef.orderByChild("name").equalTo(name).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                teams.add(dataSnapshot.getValue(Team.class));
+                complete[0] = true;
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+        return teams.get(0);
+    }
+
+
 
     @Override
     public void deleteTeam(String id){
@@ -198,7 +239,7 @@ public class FirebaseTeamDataAccess implements TeamInterface{
 
     @Override
     public void addMember(String id, String member){
-        Team team = getTeam(id);
+        Team team = getTeamById(id);
         Map<String, Object> members = team.getMembers();
         members.put(member,true);
         team.setMembers(members);
@@ -207,7 +248,7 @@ public class FirebaseTeamDataAccess implements TeamInterface{
 
     @Override
     public void removeMember(String id, String member){
-        Team team = getTeam(id);
+        Team team = getTeamById(id);
         Map<String, Object> members = team.getMembers();
         members.put(member,null);
         team.setMembers(members);
@@ -216,7 +257,7 @@ public class FirebaseTeamDataAccess implements TeamInterface{
 
     @Override
     public void addProject(String id, String project){
-        Team team = getTeam(id);
+        Team team = getTeamById(id);
         Map<String, Object> projects = team.getProjects();
         projects.put(project,true);
         team.setProjects(projects);
@@ -225,7 +266,7 @@ public class FirebaseTeamDataAccess implements TeamInterface{
 
     @Override
     public void removeProject(String id, String project){
-        Team team = getTeam(id);
+        Team team = getTeamById(id);
         Map<String, Object> projects = team.getProjects();
         projects.put(project,null);
         team.setProjects(projects);

@@ -7,7 +7,8 @@ import java.util.List;
 public interface ProjectInterface {
     void insertProject(Project project);
     List<Project> getAllProjects();
-    Project getProject(String id);
+    Project getProjectById(String id);
+    Project getProjectByName(String name);
     void deleteProject(String id);
     void updateProject(String id, Project project);
 }

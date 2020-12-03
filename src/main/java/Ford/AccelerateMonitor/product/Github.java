@@ -6,6 +6,7 @@ import Ford.AccelerateMonitor.model.Commit;
 import Ford.AccelerateMonitor.model.GitHub;
 import Ford.AccelerateMonitor.service.RecordsService;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -71,40 +72,68 @@ public class Github extends Product{
     private RecordsService getRecordsService() { return SpringContext.getBean(RecordsService.class); }
 
     public String constructApiUrl(String URL){
-        String ApiUrl = "https://api.github.com/repos" + URL.substring(URL.indexOf("github.com") + 10) + "/commits";
+        String ApiUrl = "https://api.github.com/repos" + URL.substring(URL.indexOf("github.com") + 10) + "/commits?per_page=100&page=1";
         return ApiUrl;
     }
 
-    public void getInitialCommitData() throws IOException, InterruptedException, ParseException {
+    public String getAllCommitData() throws IOException, InterruptedException, ParseException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request;
-        // if public repo
-        request = HttpRequest.newBuilder()
-                .GET()
-                .header("accept", "application/json")
-                .uri(URI.create(constructApiUrl(this.url)))
-                .build();
+        String apiUrl = constructApiUrl(this.url);
+        String status = "Incomplete";
+        boolean[] complete = {false};
+        int c = 1;
+        while(!complete[0]) {
+            request = HttpRequest.newBuilder()
+                    .GET()
+                    .header("accept", "application/json")
+                    .header("Authorization", "token " + token)
+                    .uri(URI.create(apiUrl))
+                    .build();
 
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if(response.statusCode() == 401){
+                status = "Bad Access Token.";
+                break;
+            } else {
+                ObjectMapper mapper = new ObjectMapper();
 
-        ObjectMapper mapper = new ObjectMapper();
+                List<GitHub> commits = mapper.readValue(response.body(), new TypeReference<List<GitHub>>() {
+                });
 
-        List<GitHub> commits = mapper.readValue(response.body(), new TypeReference<List<GitHub>>() {});
+                for (int i = 0; i < commits.size(); i++) {
+                    GitHub last = commits.get(i);
+                    Map<String, String> dataMap = new HashMap<String, String>();
+                    dataMap.put("node_id", last.getNode_id());
+                    String date = last.getCommit().path("author").path("date").asText();
+                    String author = last.getCommit().path("author").path("name").asText();
+                    String sha = last.getSha();
+                    dataMap.put("date", date);
+                    dataMap.put("name", author);
 
-        GitHub last = commits.get(commits.size() - 1);
+                    Record record = new Commit(date, this.projectName, author, sha);
 
-        Map<String, String> dataMap = new HashMap<String, String>();
-        dataMap.put("node_id", last.getNode_id());
-        String date = last.getCommit().path("author").path("date").asText();
-        String author = last.getCommit().path("author").path("name").asText();
-        String sha = last.getSha();
-        dataMap.put("date", date);
-        dataMap.put("name", author);
+                    getRecordsService().addRecord(record);
+                }
+                c += 1;
+                if (commits.size() < 100)
+                    complete[0] = true;
+                else
+                    apiUrl = apiUrl.substring(0, apiUrl.length() - digits(c)) + c;
+            }
+            status = "Success";
+        }
+        return status;
+    }
 
-        Record record = new Commit(date, this.projectName, author, sha);
-
-        getRecordsService().addRecord(record);
+    private int digits(int i){
+        int c = 0;
+        while(i != 0){
+            i /= 10;
+            c += 1;
+        }
+        return c;
     }
 
     private String url;

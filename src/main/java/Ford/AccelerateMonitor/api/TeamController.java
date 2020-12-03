@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-//@CrossOrigin(origins = "http://localhost:8080")
-@CrossOrigin(origins = {"http://localhost:8081", "http://35.9.22.64:8888/"})
+@CrossOrigin(origins = {"http://localhost:8081", "http://35.9.22.64:8888/", "http://35.9.22.89:8888/", "http://35.9.22.63:8888/", "http://accmonitor.com"})
 @RequestMapping("teams")
 @RestController
 public class TeamController {
@@ -20,10 +19,8 @@ public class TeamController {
         this.teamService = teamService;
     }
 
-
     @PostMapping("/addTeam")
     public void addTeam(@RequestBody Team team) { teamService.addTeam(team); }
-
 
     @GetMapping("/getAllTeams")
     public List<Team> getAllTeams() {
@@ -33,7 +30,7 @@ public class TeamController {
     @GetMapping(path = "/getTeam/{id}")
     public Team getTeamById(@PathVariable("id") String id){ return teamService.getTeamById(id); }
 
-    @GetMapping(path = "/getTeam/{name}")
+    @GetMapping(path = "/getTeamByName/{name}")
     public Team getTeamByName(@PathVariable("name") String name){ return teamService.getTeamByName(name); }
 
     @DeleteMapping(path = "/deleteTeam/{id}")

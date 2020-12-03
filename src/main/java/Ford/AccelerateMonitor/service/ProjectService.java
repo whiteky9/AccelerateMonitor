@@ -21,9 +21,9 @@ public class ProjectService {
         return projectInterface.getAllProjects();
     }
 
-    public Project getProjectById(String id) { return projectInterface.getProject(id); }
+    public Project getProjectById(String id) { return projectInterface.getProjectById(id); }
 
-    public Project getProjectByName(String name) { return projectInterface.getProject(name); }
+    public Project getProjectByName(String name) { return projectInterface.getProjectByName(name); }
 
     public void deleteProject(String id){ projectInterface.deleteProject(id); }
 

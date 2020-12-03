@@ -5,13 +5,16 @@ import Ford.AccelerateMonitor.product.Jenkins;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Repository("productDataAccess")
 public class FirebaseProductDataAccess implements ProductInterface{
@@ -37,8 +40,10 @@ public class FirebaseProductDataAccess implements ProductInterface{
         DatabaseReference jenkinsRef = dataRef.child("products/jenkins");
 
         //pushes provided member into the database
-        DatabaseReference newRecordRef = jenkinsRef.push();
-        newRecordRef.setValueAsync(jenkins);
+        Map<String, Object> newJenkins = new HashMap<>();
+        String key = jenkins.getProjectName() + ':' + jenkins.getName();
+        newJenkins.put(key,jenkins);
+        jenkinsRef.setValueAsync(newJenkins);
     }
 
     @Override
@@ -49,8 +54,70 @@ public class FirebaseProductDataAccess implements ProductInterface{
         DatabaseReference githubRef = dataRef.child("products/github");
 
         //pushes provided member into the database
-        DatabaseReference newRecordRef = githubRef.push();
-        newRecordRef.setValueAsync(github);
+        Map<String, Object> newGithub = new HashMap<>();
+        String key = github.getProjectName() + ':' + github.getName();
+        newGithub.put(key,github);
+        githubRef.updateChildrenAsync(newGithub);
+    }
+
+    @Override
+    public Object getGithubProduct(String name) {
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
+        DatabaseReference dataRef = DB.getReference();
+        DatabaseReference githubRef = dataRef.child("products/github");
+
+        List<Object> products = new ArrayList<>();
+        final boolean[] complete = {false};
+
+        githubRef.orderByChild("projectName").equalTo(String.valueOf(name)).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Object> gitProd = (Map<String, Object>) dataSnapshot.getValue();
+                List<Object> git = new ArrayList<Object>(gitProd.values());
+
+                products.add(git.get(0));
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        while(!complete[0]){}
+
+        return products.get(0);
+    }
+
+    @Override
+    public Object getJenkinsProduct(String name) {
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
+        DatabaseReference dataRef = DB.getReference();
+        DatabaseReference jenkinsRef = dataRef.child("products/jenkins");
+
+        List<Object> products = new ArrayList<>();
+        final boolean[] complete = {false};
+
+        jenkinsRef.orderByChild("projectName").equalTo(String.valueOf(name)).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Object> jenkinsProd = (Map<String, Object>) dataSnapshot.getValue();
+                List<Object> jenkins = new ArrayList<Object>(jenkinsProd.values());
+
+                products.add(jenkins.get(0));
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        while(!complete[0]){}
+
+        return products.get(0);
     }
 
     final private FirebaseApp app;

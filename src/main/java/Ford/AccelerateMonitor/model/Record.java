@@ -34,6 +34,8 @@ public abstract class Record {
     public String getUser() {return null;};
 
     public String getSha() {return null;};
+
+    public String getCommitID() {return null;};
 /*
     public abstract String getCommitID();
     public abstract void setCommitID(String commitID);

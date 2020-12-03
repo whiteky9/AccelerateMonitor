@@ -62,8 +62,7 @@ public class RecordsDataAccess implements RecordsInterface {
         else if(record.getClass() == (new Commit()).getClass()){
             DatabaseReference commitsRef = recordsRef.child("commits/");
             Map<String, Object> newCommit = new HashMap<>();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            String key = sdf.parse(record.getDate()).getTime()+":"+record.getProjectName();
+            String key = record.getSha();
             newCommit.put(key, record);
             commitsRef.updateChildrenAsync(newCommit);
         }

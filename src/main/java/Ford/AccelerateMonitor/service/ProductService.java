@@ -16,4 +16,9 @@ public class ProductService {
     public void addJenkinsServer(Jenkins jenkins){ productInterface.addJenkinsServer(jenkins); }
 
     public void addGithub(Github github){ productInterface.addGithub(github); }
+
+    public Object getGithubProduct(String name) { return productInterface.getGithubProduct(name); }
+
+    public Object getJenkinsProduct(String name) { return productInterface.getJenkinsProduct(name); }
+
 }

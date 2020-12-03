@@ -7,8 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@CrossOrigin(origins = "http://localhost:8080")
-@CrossOrigin(origins = {"http://localhost:8081", "http://35.9.22.64:8888/"})
+@CrossOrigin(origins = {"http://localhost:8081", "http://35.9.22.64:8888/", "http://35.9.22.89:8888/", "http://35.9.22.63:8888/", "http://accmonitor.com"})
 @RequestMapping("projects")
 @RestController
 public class ProjectController {
@@ -30,7 +29,7 @@ public class ProjectController {
     @GetMapping(path = "/getProject/{id}")
     public Project getProjectById(@PathVariable("id") String id){ return projectService.getProjectById(id); }
 
-    @GetMapping(path = "/getProject/{name}")
+    @GetMapping(path = "/getProjectByName/{name}")
     public Project getProjectByName(@PathVariable("name") String name){ return projectService.getProjectByName(name); }
 
     @DeleteMapping(path = "/deleteProject/{id}")

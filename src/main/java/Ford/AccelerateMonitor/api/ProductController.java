@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.text.ParseException;
 
-@CrossOrigin(origins = {"http://localhost:8081", "http://35.9.22.64:8888/"})
+@CrossOrigin(origins = {"http://localhost:8081", "http://35.9.22.64:8888/", "http://35.9.22.89:8888/", "http://35.9.22.63:8888/", "http://accmonitor.com"})
 @RequestMapping("/products")
 @RestController
 public class ProductController {
@@ -26,8 +26,17 @@ public class ProductController {
     }
 
     @PostMapping("/addGithubProduct")
-    public void registerGithub(@RequestBody Github github) throws IOException, InterruptedException, ParseException {
-        github.getInitialCommitData();
-        productService.addGithub(github);
+    public String registerGithub(@RequestBody Github github) throws IOException, InterruptedException, ParseException {
+        String status = github.getAllCommitData();
+        if(status.equals("Success"))
+            productService.addGithub(github);
+        return status;
     }
+
+    @GetMapping("/getGithubProduct/{name}")
+    public Object getGithubProduct(@PathVariable("name") String name){ return productService.getGithubProduct(name); }
+
+    @GetMapping("/getJenkinsProduct/{name}")
+    public Object getJenkinsProduct(@PathVariable("name") String name){ return productService.getJenkinsProduct(name); }
+
 }

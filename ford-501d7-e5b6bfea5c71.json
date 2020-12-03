@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "ford-501d7",
+  "private_key_id": "e5b6bfea5c71200ff5a5dcdb668b706ee02ffc36",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC5K+pHCln8di0F\nhu4lNaER84/UEvWrpu6j+GNlUOhygZTsJUcVdj0ai3YMsIAsK0F9DGcMU5XqZxF4\nzCqKH3XwmJRRya4hxL7CxYfvQLWnQHLOVMSGd/qXsIxPKnUI3PkqSFV1GP+25ZD2\n6xVx5/rLn55oh+ybOUpTtpFebJ9vohR0a80+SF+g4KKsfgZ4Wfr77s/Hvab9+3nH\nFlo09oGW1iHLUw+R1gW8fZzWx/Ie31Oj8tru5V7w5AKrAoza+c+/YrqSxaNl2WSf\nAJhd9Lh84KI+dSgX7uMqehzh46+0PzdSV0ABsXm0WfLqSnXGnbDN/ITLsIChnRkt\nvIfOupBRAgMBAAECggEARHNl8uXyNt/uq6zh6vJkvPCW+hQaKd6XOBkRkTnz+6RI\nS3VKTjY7x0zHklBKyUkiN9o2W7moYRLBxDBhB1cy74JPzd4ql0QWKoT/x6NZo16x\nMfHnBjhi8+EpNPiic+jP2OANazCXEuLREF39uvJA5TX3xnd8sTLf9Ys3OLsZwxd7\nudwu9Y5SjiY/nvZ78xe3TfzhMW0fcawp/3wJmU1MPQMOTbG14cq5RVPavwrEScUx\nCFPpIrHfAveT2csI35Uo8fWL56F2pJIJRNxQH87tBLOI8r6I6oGp32N6PbSZBJOx\n2mcpDHKnyCA9qjgbadvZd2KBtqInTNXozCoIdVW6wwKBgQDht/PBKgyhpDi3iTV0\nDhvwAbezH3Nhv6Q1E+KtHISAK/l3OIFAYrcBCYMVSdWhwAjZJ0nbpu07otaN6gO6\nyvD1TwQUNGgFCNuRLSJI3LjhSPrNQVgudSErX9Wc8bNy1N6LG1A9xCSOvD+vHCub\nwjDYmeX/KswHfgaIzv7xt4iiiwKBgQDSA2vvINz4qlt9gOqBhd+HKG7h4X2su6cx\n5QI+PUm+vJwpkHqVbNYVrKR2ArL44uiv+KiUhwm6zK+TdR7lDjNsAgOTKUzG/Mx6\n479ZfpzUxV9O1qT4UIy3d/6tOekP0Y3HR/ioy6BI3TA4SvtdzvxBcUP8Numpin9T\nafWMKhOAEwKBgQCKJdsje4f1mpw4ANtdZ5FDyNlU4UfuKKvo7H3M8+pIxCFQDZ5V\n+NUG5np7GhCNigogVkKHFFiYKmbkvrh/p9voV+8oKpcLlctExHn6XFUvVUpjO74r\n2PZvJJ2KDAiHnK+ENjhbRWQWlDLqCvTJxQW+XBr/nIL5hvGa5A33hRw0VwKBgCFe\nU8757MJB5ymIyznrOHn0LbIMLvi8FDO0TGfxOv9oXnOoNiH52gY1mSf7A87R1uDm\n5Ho8/onErf0C9fa1C+yUYVcHj+BqGF9KQoQIvwh7l8oiBrJBsioQkdGaSvKtfBZ2\n1AaV3BDXvCqll0zvb1tCkOfJHdVHYTWyt0YfBVwrAoGBAMDfcv2DsK6dm2rpr/cZ\nMx49A8pR7v/FwXTKz0pWx4ZbV632i+5+Q3tzGi78DsYuWDHKb7auAxJVmdlSdHO5\ntHkkkZrTVf0hEVKIvNcYybym0gd/rEbcRSfi/OhlwJbvyde3t7gjfSUDxKTK6OZc\nginVQL7za2QbxOKCjjJug5/b\n-----END PRIVATE KEY-----\n",
+  "client_email": "fordservice@ford-501d7.iam.gserviceaccount.com",
+  "client_id": "103086745714015200115",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/fordservice%40ford-501d7.iam.gserviceaccount.com"
+}
