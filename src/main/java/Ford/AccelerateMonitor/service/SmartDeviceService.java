@@ -181,13 +181,19 @@ public class SmartDeviceService extends DialogflowApp {
             if ((DAYSINMONTHS[month] - day) <= 6) {
                 day += DAYSINMONTHS[month] - day;
             }
+            else if (request.getStartDate().getDay() != 0) {
+                day += 6 - request.getStartDate().getDay();
+            }
             else {
                 day += 6;
             }
 
             request.setEndDateSame(String.format("%02d",month+1) + " " + String.format("%02d",day) + " " + year);
-            if (request.getStatRequested().equals("Lead Time"))
+
+            if (request.getStatRequested().equals("Lead Time")) {
+
                 ints.add(leadTime(smartDeviceInterface.getLeadTimeRecords(request)));
+            }
             else if (request.getStatRequested().equals("Mean Time To Restore"))
                 ints.add(mttr(smartDeviceInterface.getMTTRRecords(request)));
             else if (request.getStatRequested().equals("Change Fail Percentage")) {
