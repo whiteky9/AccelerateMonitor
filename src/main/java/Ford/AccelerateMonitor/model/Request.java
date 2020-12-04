@@ -1,5 +1,7 @@
 package Ford.AccelerateMonitor.model;
 
+import com.google.actions.api.ActionResponse;
+import com.google.actions.api.response.ResponseBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,28 +35,35 @@ public class Request {
         JSONObject parameters = queryResult.getJSONObject("parameters");
         String statRequested = parameters.get("statrequested").toString();
         String targetTeamArray = parameters.get("targetteam").toString();
-        String targetTeam = targetTeamArray.substring(2, targetTeamArray.length()-2);
-        targetTeam = targetTeam.substring(0,1).toUpperCase() + targetTeam.substring(1);
+        String targetTeam = "";
+        if (targetTeamArray.length() != 2) {
+            targetTeam = targetTeamArray.substring(2, targetTeamArray.length()-2);
+            targetTeam = targetTeam.substring(0,1).toUpperCase() + targetTeam.substring(1);
+        }
         String targetProject = parameters.get("targetProject").toString();
         JSONArray datePeriod = parameters.getJSONArray("date-period");
-        JSONObject datePeriodObject = (JSONObject) datePeriod.get(0);
-        String startDateString = datePeriodObject.get("startDate").toString();
-        this.setStatRequested(statRequested);
-        if(targetTeam.equals(""))
-            this.setTargetTeam(null);
-        else
-            this.setTargetTeam(targetTeam);
-        if(targetProject.equals(""))
-            this.setTargetProject(null);
-        else
-            this.setTargetProject(targetProject);
-        DateFormat source = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
-        Date date = source.parse(startDateString);
-        DateFormat dest = new SimpleDateFormat("MM dd yyyy");
-        startDateString = dest.format(date);
-        
-        this.setStartDate(startDateString);
-        this.endDate = new Date(System.currentTimeMillis());
+        if (datePeriod.length() == 0) {
+            String error = "could not get the date period, please ask again in a different way";
+        } else {
+            JSONObject datePeriodObject = (JSONObject) datePeriod.get(0);
+            String startDateString = datePeriodObject.get("startDate").toString();
+
+            this.setStatRequested(statRequested);
+            if (targetTeam.equals(""))
+                this.setTargetTeam(null);
+            else
+                this.setTargetTeam(targetTeam);
+            if (targetProject.equals(""))
+                this.setTargetProject(null);
+            else
+                this.setTargetProject(targetProject);
+            DateFormat source = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+            Date date = source.parse(startDateString);
+            DateFormat dest = new SimpleDateFormat("MM dd yyyy");
+            startDateString = dest.format(date);
+            this.setStartDate(startDateString);
+            this.endDate = new Date(System.currentTimeMillis());
+        }
     }
 
 

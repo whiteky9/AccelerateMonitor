@@ -13,7 +13,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import com.google.actions.api.ActionResponse;
 import com.google.actions.api.response.ResponseBuilder;
-
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.Month;
 import javax.sound.midi.SysexMessage;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -37,24 +38,28 @@ public class SmartDeviceService extends DialogflowApp {
     public String getAccelerateStatString(Request request) throws ParseException {
         List<Record> records;
         Map<Commit,Build> leadTimeRecords;
-        String out = "Stat not recognized";
+        String out = "Statistic not recognized";
+        if (request.getStartDate() == null) {
+            out = "Could not get date period, please ask again in a different way";
+            return out;
+        }
+        String start_date = request.getStartDate().toString();
+        start_date = start_date.substring(0, 10);
         DecimalFormat df = new DecimalFormat("0.00");
         if(request.getStatRequested().equalsIgnoreCase("Lead Time")){
             leadTimeRecords = smartDeviceInterface.getLeadTimeRecords(request);
-            if (leadTimeRecords == null)
-                out = "Team Does Not Exist.";
+            if (leadTimeRecords.isEmpty())
+                out = "Team or Project Does Not Exist or no records are present.";
             else {
                 float averageLeadTime = leadTime(leadTimeRecords);
-                out = "Average Lead Time since " + request.getStartDate() + " is: " + df.format(averageLeadTime) + " hours.";
+                out = "Average Lead Time since " + start_date + " is: " + df.format(averageLeadTime) + " hours.";
             }
         }
 
         if(request.getStatRequested().equalsIgnoreCase("mean time to restore")){
             records = smartDeviceInterface.getMTTRRecords(request);
-            if(records == null)
-                out = "Team Does Not Exist.";
-            else if (records.isEmpty())
-                out = "No Records Found for the Given Team/Project.";
+            if(records.isEmpty())
+                out = "Team or Project Does Not Exist or no records are present.";
             else {
                 // Match up records into pairs
                 int pairCount = 0;
@@ -104,8 +109,8 @@ public class SmartDeviceService extends DialogflowApp {
         }
         if(request.getStatRequested().equalsIgnoreCase("deployment frequency")){
             records = smartDeviceInterface.getDeploymentFrequencyRecords(request);
-            if (records == null)
-                out = "Team Does Not Exist.";
+            if (records.isEmpty())
+                out = "Team or Project Does Not Exist or no records are present";
             else {
                 int deploys = records.size();
                 Date current = new Date(System.currentTimeMillis());
@@ -118,26 +123,26 @@ public class SmartDeviceService extends DialogflowApp {
 
             //calculate and set to out
             if (records == null)
-                out = "Team Does Not Exist.";
+                out = "Team or Project Does Not Exist or no records are present";
             else
-                out = "Change Fail Percentage = " + df.format(changeFail(records));
+                out = "Change Fail Percentage = " + df.format(changeFail(records)) + "%";
         }
         if(request.getStatRequested().equalsIgnoreCase("Builds Executed")){
             records = smartDeviceInterface.getBuildRecords(request);
             if (records == null)
-                out = "Team Does Not Exist.";
+                out = "Team or Project Does Not Exist or no records are present";
             else {
                 int deploys = records.size();
-                out = deploys + " build(s) since " + request.getStartDate().toString() + ".";
+                out = deploys + " build(s) since " + start_date + ".";
             }
         }
         if(request.getStatRequested().equalsIgnoreCase("Commits")){
             records = smartDeviceInterface.getCommitRecords(request);
             if (records == null)
-                out = "Team Does Not Exist.";
+                out = "Team or Project Does Not Exist or no records are present";
             else {
                 int commits = records.size();
-                out = commits + " commit(s) since " + request.getStartDate().toString() + ".";
+                out = commits + " commit(s) since " + start_date + ".";
             }
         }
 
@@ -181,19 +186,13 @@ public class SmartDeviceService extends DialogflowApp {
             if ((DAYSINMONTHS[month] - day) <= 6) {
                 day += DAYSINMONTHS[month] - day;
             }
-            else if (request.getStartDate().getDay() != 0) {
-                day += 6 - request.getStartDate().getDay();
-            }
             else {
                 day += 6;
             }
 
             request.setEndDateSame(String.format("%02d",month+1) + " " + String.format("%02d",day) + " " + year);
-
-            if (request.getStatRequested().equals("Lead Time")) {
-
+            if (request.getStatRequested().equals("Lead Time"))
                 ints.add(leadTime(smartDeviceInterface.getLeadTimeRecords(request)));
-            }
             else if (request.getStatRequested().equals("Mean Time To Restore"))
                 ints.add(mttr(smartDeviceInterface.getMTTRRecords(request)));
             else if (request.getStatRequested().equals("Change Fail Percentage")) {
@@ -313,21 +312,3 @@ public class SmartDeviceService extends DialogflowApp {
         return failed / (successCommits - repeats);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
