@@ -11,9 +11,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.List;
 
 public class Jenkins extends Product {
 
@@ -27,14 +25,19 @@ public class Jenkins extends Product {
      * @param jobName name of Jenkins job
      * @param userName Jenkins username for authentication
      * @param token auth token generated from Jenkins
+     * @param projectName project name registered in portal
+     * @param env environment associated with this job
      * */
     public Jenkins(
             String url, String jobName,
-            String userName, String token) {
+            String userName, String token,
+            String projectName, String env) {
         super(jobName);
         this.url = url;
         this.userName = userName;
         this.token = token;
+        this.projectName = projectName;
+        this.env = env;
     }
 
     /** Default Constructor
@@ -95,15 +98,23 @@ public class Jenkins extends Product {
 
     private String token;
 
-    private String env = "PROD"; // UNDER ASSUMPTION EACH PIPELINE IS FOR SPECIFIC ENVIRONMENT
+    private String env;
 
-    private String projectName = "jenkins-test"; // WILL GET THIS INFORMATION FROM PROJECT INSTANCE
+    private String projectName;
 
+    /**
+     * Method to create Jenkins job specific URL
+     * @returns String job specific URL
+     * */
     private String getJobUrl()
     {
         return url+"/job/"+name+"/";
     }
 
+    /**
+     * Allows class to connect to database
+     * @returns RecordsService
+     * */
     private RecordsService getRecordsService()
     {
         return SpringContext.getBean(RecordsService.class);
@@ -129,7 +140,6 @@ public class Jenkins extends Product {
         return super.retreiveData(url, getAuthString());
     }
 
-    /** START OF PUBLIC METHODS */
 
     /**
      * Retrieves job data from Jenkins API using retrieveData function
@@ -139,8 +149,6 @@ public class Jenkins extends Product {
     public void getAllBuildLogs() throws ParseException {
         String url = getJobUrl()+"api/json";
         JsonNode jsonNode = retreiveData(url);
-
-        List<String> allBuilds = new ArrayList<>();
 
         JsonNode buildsArray = jsonNode.path("builds");
         for ( JsonNode build : buildsArray )
@@ -165,10 +173,22 @@ public class Jenkins extends Product {
                     .atZone(ZoneId.of("EST5EDT"));
             String formatted = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z"));
 
-            // GET DEPLOY BOOL - not implemented
+            // GET DEPLOY BOOL
+            Boolean deployBool = false;
+            JsonNode paramArray = buildData.findValue("parameters");
+
+            if (paramArray != null) {
+                for (final JsonNode paramObj : paramArray) {
+                    JsonNode nameNode = paramObj.get("name");
+                    if (nameNode.asText().equals("Deploy")) {
+                        deployBool = paramObj.get("value").asBoolean();
+                    }
+
+                }
+            }
 
             // CREATE RECORD
-            Record record = new Build(projectName, formatted, commitID, result, true, env);
+            Record record = new Build(projectName, formatted, commitID, result, deployBool, env);
             getRecordsService().addRecord(record);
 
 

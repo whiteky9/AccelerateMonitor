@@ -75,13 +75,12 @@ public class SmartDeviceService extends DialogflowApp {
 
                     // Assuming incident records are in order of time stamp (down record before restored record)
                     // Assuming when asking for MTTR by team, there may be more than one project
-                    // Does NOT consider if there is a restored record with no matching down record
                     // Add every Down record to temporary hash map with project name as key
                     // Next Restored record with the same project name is a match
                     // For each pair calculate time to restore and add to sum
                     if (temp.getStatus().equals("Down")) {
                         tempMap.put(temp.getProjectName(), temp);
-                    } else if (temp.getStatus().equals("Restored")) {
+                    } else if (temp.getStatus().equals("Restored") && tempMap.containsKey(temp.getProjectName())) {
 
                         LocalDateTime downDate = LocalDateTime.parse(temp.getDate(), formatter);
                         LocalDateTime restoredDate = LocalDateTime.parse(tempMap.get(temp.getProjectName()).getDate(), formatter);
