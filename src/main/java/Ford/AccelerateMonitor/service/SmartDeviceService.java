@@ -43,8 +43,11 @@ public class SmartDeviceService extends DialogflowApp {
             if (leadTimeRecords == null)
                 out = "Team Does Not Exist.";
             else {
-                float averageLeadTime = leadTime(leadTimeRecords);
-                out = "Average Lead Time since " + request.getStartDate() + " is: " + df.format(averageLeadTime) + " hours.";
+                long averageLeadTime = leadTime(leadTimeRecords);
+                final long[] timeMS = {averageLeadTime};
+                String hour = dateStringFormatter(timeMS);
+                String minute = dateStringFormatter(timeMS);
+                out = "Average Lead Time since " + request.getStartDate() + " is:" + hour + minute;
             }
         }
 
@@ -108,8 +111,15 @@ public class SmartDeviceService extends DialogflowApp {
             else {
                 int deploys = records.size();
                 Date current = new Date(System.currentTimeMillis());
-                float days = (current.getTime() - request.getStartDate().getTime()) / (1000 * 60 * 60 * 24);
-                out = deploys + " deploy(s) " + " in " + (int) days + " days. Deployment Frequency is: " + df.format(deploys / days) + " " + " deploys per day";
+                final long[] timeMS = {current.getTime() - request.getStartDate().getTime()};
+                String day = dateStringFormatter(timeMS);
+                String hour = dateStringFormatter(timeMS);
+
+                out = deploys + " deploy(s) " + " in" + day + hour + ".";
+                if(day.contains("day"))
+                    out += " Deployment Frequency is: " + df.format(deploys / timeMS[0]/(1000 * 60 * 60 * 24)) + " " + " deploys per day";
+                else if(day.contains("hour"))
+                    out += " Deployment Frequency is: " + df.format(deploys / timeMS[0]/(1000 * 60 * 60)) + " " + " deploys per day";
             }
         }
         if(request.getStatRequested().equalsIgnoreCase("Change Fail Percentage")){
@@ -170,7 +180,7 @@ public class SmartDeviceService extends DialogflowApp {
             day += 6;
             request.setEndDateSame(String.format("%02d",month+1) + " " + String.format("%02d",day) + " " + year);
             if (request.getStatRequested().equals("Lead Time"))
-                ints.add(leadTime(smartDeviceInterface.getLeadTimeRecords(request)));
+                ints.add((float) (leadTime(smartDeviceInterface.getLeadTimeRecords(request))/(1000 * 60 * 60)));
             else if (request.getStatRequested().equals("Mean Time To Restore"))
                 ints.add(mttr(smartDeviceInterface.getMTTRRecords(request)));
             else if (request.getStatRequested().equals("Change Fail Percentage"))
@@ -190,12 +200,13 @@ public class SmartDeviceService extends DialogflowApp {
         return response.getWebhookResponse();
     }
 
+
     /**
      * Statistic calculations
      *
      *
      */
-    private float leadTime(Map<Commit,Build> leadTimeRecords) throws ParseException {
+    private long leadTime(Map<Commit,Build> leadTimeRecords) throws ParseException {
         SimpleDateFormat buildSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
         SimpleDateFormat commitSdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
         float buildTime;
@@ -211,7 +222,7 @@ public class SmartDeviceService extends DialogflowApp {
             totalLeadTime += buildTime - commitTime;
             c += 1;
         }
-        return totalLeadTime / c / (1000 * 60 * 60);
+        return (long) (totalLeadTime / c);
     }
 
     private float mttr(List<Record> records){
@@ -288,9 +299,43 @@ public class SmartDeviceService extends DialogflowApp {
 
         return failed / (successCommits - repeats);
     }
+    /**
+     *
+     * Date String Formatter
+     * for converting time in ms into a neatly formatted string
+     *
+     * @param timeMS a list containing one long representing the time in ms (passed by reference)
+     * timeMS is replaced by an int representing MS in next smallest unit of time, if applicable
+     * this allows for multiple sequential uses when multiple units are desired, ie. 3 hours 26 min
+     *
+     * returns formatted date string
+     */
+    private String dateStringFormatter(long[] timeMS){
+        String out = "";
+
+        // if largest complete unit is days, add days to string
+        if(timeMS[0]/(1000 * 60 * 60 * 24) >= 1) {
+            out = " " + out + timeMS[0] / (1000 * 60 * 60 * 24) + " day";
+            if(timeMS[0]/(1000 * 60 * 60 * 24) > 1)
+                out += "s";
+            timeMS[0] = timeMS[0] % (1000 * 60 * 60 * 24);
+        }
+        // now hours
+        else if(timeMS[0]/(1000 * 60 * 60) >= 1) {
+            out = " " + out + timeMS[0] / (1000 * 60 * 60) + " hour";
+            if(timeMS[0]/(1000 * 60 * 60) > 1)
+                out += "s";
+            timeMS[0] = timeMS[0] % (1000 * 60 * 60);
+        }
+        // now minutes
+        else if (timeMS[0]/(1000 * 60) >= 1) {
+            out = " " + out + (int) (timeMS[0] / (1000 * 60)) + " minute";
+            if(timeMS[0]/(1000 * 60) > 1)
+                out += "s";
+        }
+        return out;
+    }
 }
-
-
 
 
 
