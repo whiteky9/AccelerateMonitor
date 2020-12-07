@@ -7,16 +7,14 @@ import Ford.AccelerateMonitor.model.Record;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.*;
 import org.springframework.stereotype.Repository;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Repository("recordsDataAccess")
 public class RecordsDataAccess implements RecordsInterface {
@@ -70,6 +68,95 @@ public class RecordsDataAccess implements RecordsInterface {
             //error
         }
     }
+
+    public void deleteRecords(String name){
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
+        DatabaseReference buildsRef = DB.getReference("records/builds");
+        Map<String, Object> deleteBuilds = new HashMap<>();
+        List<String> keys = new ArrayList<>();
+        final Boolean[] complete = {false,false,false};
+        buildsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()){
+                    Build record = child.getValue(Build.class);
+                    if (record.getProjectName().equals(name))
+                        keys.add(child.getKey());
+                }
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+        for(int i=0; i<keys.size();i++){
+            deleteBuilds.put(keys.get(i), null);
+        }
+        buildsRef.updateChildrenAsync(deleteBuilds);
+
+
+        // commits
+        DatabaseReference commitsRef = DB.getReference("records/commits");
+        Map<String, Object> deleteCommits = new HashMap<>();
+        keys.clear();
+        commitsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()){
+                    Commit record = child.getValue(Commit.class);
+                    System.out.println("here");
+                    if (record.getProjectName().equals(null)){
+                        keys.add(child.getKey());
+                    }
+                    if (record.getProjectName().equals(name))
+                        keys.add(child.getKey());
+
+                }
+                complete[1] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[1]){}
+        for(int i=0; i<keys.size();i++){
+            deleteCommits.put(keys.get(i), null);
+        }
+        commitsRef.updateChildrenAsync(deleteCommits);
+
+        // incidents
+        DatabaseReference incidentsRef = DB.getReference("records/incidents");
+        Map<String, Object> deleteIncidents = new HashMap<>();
+        keys.clear();
+        incidentsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()){
+                    IncidentRecord record = child.getValue(IncidentRecord.class);
+                    if (record.getProjectName().equals(name))
+                        keys.add(child.getKey());
+                }
+                complete[2] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[2]){}
+        for(int i=0; i<keys.size();i++){
+            deleteIncidents.put(keys.get(i), null);
+        }
+        incidentsRef.updateChildrenAsync(deleteIncidents);
+    }
+
+
 
     final private FirebaseApp app;
 }

@@ -76,7 +76,7 @@ public class Github extends Product{
         return ApiUrl;
     }
 
-    public String getAllCommitData() throws IOException, InterruptedException, ParseException {
+    public String obtainAllCommitData() throws IOException, InterruptedException, ParseException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request;
         String apiUrl = constructApiUrl(this.url);

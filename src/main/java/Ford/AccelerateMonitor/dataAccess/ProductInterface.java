@@ -10,4 +10,6 @@ public interface ProductInterface {
 
     Object getGithubProduct(String name);
     Object getJenkinsProduct(String name);
+
+    void deleteProducts(String name);
 }

@@ -8,4 +8,5 @@ import java.text.ParseException;
 public interface RecordsInterface {
 
     void addRecord(Record record) throws ParseException;
+    void deleteRecords(String name);
 }

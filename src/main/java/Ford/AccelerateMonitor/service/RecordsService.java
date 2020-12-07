@@ -16,4 +16,5 @@ public class RecordsService {
 
     public void addRecord(Record record) throws ParseException { recordsInterface.addRecord(record); }
 
+    public void deleteRecords(String name) {recordsInterface.deleteRecords(name); }
 }

@@ -27,7 +27,7 @@ public class ProductController {
 
     @PostMapping("/addGithubProduct")
     public String registerGithub(@RequestBody Github github) throws IOException, InterruptedException, ParseException {
-        String status = github.getAllCommitData();
+        String status = github.obtainAllCommitData();
         if(status.equals("Success"))
             productService.addGithub(github);
         return status;
@@ -39,4 +39,6 @@ public class ProductController {
     @GetMapping("/getJenkinsProduct/{name}")
     public Object getJenkinsProduct(@PathVariable("name") String name){ return productService.getJenkinsProduct(name); }
 
+    @DeleteMapping("/deleteProducts/{name}")
+    public void deleteProducts(@PathVariable("name") String name){ productService.deleteProducts(name); }
 }

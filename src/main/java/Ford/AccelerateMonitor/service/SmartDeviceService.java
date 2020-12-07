@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.google.actions.api.ActionResponse;
 import com.google.actions.api.response.ResponseBuilder;
 
-import javax.sound.midi.SysexMessage;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -173,13 +172,7 @@ public class SmartDeviceService extends DialogflowApp {
                     ints.add((float) (smartDeviceInterface.getBuildRecords(request)).size());
                 else if (request.getStatRequested().equals("Commits"))
                     ints.add((float) smartDeviceInterface.getCommitRecords(request).size());
-                else if (request.getStatRequested().equals("Lead Time")) {
-                    Float lead = leadTime(smartDeviceInterface.getLeadTimeRecords(request));
 
-                    String d = df.format(lead.doubleValue());
-                    ints.add(Float.parseFloat(d));
-
-                }
             }
         }
 
@@ -200,11 +193,6 @@ public class SmartDeviceService extends DialogflowApp {
             request.setEndDateSame(String.format("%02d",month+1) + " " + String.format("%02d",day) + " " + year);
             if (request.getStatRequested().equals("Lead Time"))
                 ints.add((float) (leadTime(smartDeviceInterface.getLeadTimeRecords(request))/(1000 * 60 * 60)));
-
-            if (request.getStatRequested().equals("Lead Time")) {
-
-                ints.add(leadTime(smartDeviceInterface.getLeadTimeRecords(request)));
-            }
             else if (request.getStatRequested().equals("Mean Time To Restore"))
                 ints.add(mttr(smartDeviceInterface.getMTTRRecords(request)));
             else if (request.getStatRequested().equals("Change Fail Percentage")) {

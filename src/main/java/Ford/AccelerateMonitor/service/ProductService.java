@@ -21,4 +21,5 @@ public class ProductService {
 
     public Object getJenkinsProduct(String name) { return productInterface.getJenkinsProduct(name); }
 
+    public void deleteProducts(String name){ productInterface.deleteProducts(name); }
 }

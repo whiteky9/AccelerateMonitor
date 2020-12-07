@@ -1,5 +1,6 @@
 package Ford.AccelerateMonitor.dataAccess;
 
+import Ford.AccelerateMonitor.model.Build;
 import Ford.AccelerateMonitor.product.Github;
 import Ford.AccelerateMonitor.product.Jenkins;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -118,6 +119,62 @@ public class FirebaseProductDataAccess implements ProductInterface{
         while(!complete[0]){}
 
         return products.get(0);
+    }
+
+    public void deleteProducts(String name){
+        FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
+        DatabaseReference githubRef = DB.getReference("products/github");
+        Map<String, Object> deleteGithub = new HashMap<>();
+        List<String> keys = new ArrayList<>();
+        final Boolean[] complete = {false,false};
+        githubRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()){
+                    Github product = child.getValue(Github.class);
+                    if (product.getProjectName().equals(name))
+                        keys.add(child.getKey());
+                }
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]){}
+        for(int i=0; i<keys.size();i++){
+            deleteGithub.put(keys.get(i), null);
+        }
+        githubRef.updateChildrenAsync(deleteGithub);
+
+        // jenkins
+        DatabaseReference jenkinsRef = DB.getReference("products/jenkins");
+        Map<String, Object> deleteJenkins = new HashMap<>();
+        keys.clear();
+        //complete[0] = false;
+        jenkinsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()){
+                    Jenkins product = child.getValue(Jenkins.class);
+                    if (product.getProjectName().equals(name))
+                        keys.add(child.getKey());
+                }
+                complete[1] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[1]){}
+        for(int i=0; i<keys.size();i++){
+            deleteJenkins.put(keys.get(i), null);
+        }
+        jenkinsRef.updateChildrenAsync(deleteJenkins);
     }
 
     final private FirebaseApp app;

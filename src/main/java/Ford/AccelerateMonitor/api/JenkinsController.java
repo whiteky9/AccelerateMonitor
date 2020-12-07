@@ -21,4 +21,7 @@ public class JenkinsController {
 
     @PostMapping("/addJenkinsRecord")
     public void addRecord(@RequestBody Build build) throws ParseException { recordsService.addRecord(build); }
+
+    @DeleteMapping("/deleteProjectRecords/{name}")
+    public void deleteRecord(@PathVariable("name") String name) {recordsService.deleteRecords(name);}
 }
