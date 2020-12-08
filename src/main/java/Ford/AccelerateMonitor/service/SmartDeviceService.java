@@ -47,6 +47,8 @@ public class SmartDeviceService extends DialogflowApp {
         Map<Commit,Build> leadTimeRecords;
         String out = "Stat not recognized";
         DecimalFormat df = new DecimalFormat("0.00");
+
+        // requested stat is lead time
         if(request.getStatRequested().equalsIgnoreCase("Lead Time")){
             leadTimeRecords = smartDeviceInterface.getLeadTimeRecords(request);
             if (leadTimeRecords == null)
@@ -56,10 +58,14 @@ public class SmartDeviceService extends DialogflowApp {
                 final long[] timeMS = {averageLeadTime};
                 String hour = dateStringFormatter(timeMS);
                 String minute = dateStringFormatter(timeMS);
-                out = "Average Lead Time since " + request.getStartDate() + " is:" + hour + minute;
+                if(hour.equals(" 0 minutes"))
+                    out = "No commit/build record pairs found for this team.";
+                else
+                    out = "Average Lead Time since " + request.getStartDate() + " is:" + hour + minute;
             }
         }
 
+        // requested stat is mean time to restore
         if(request.getStatRequested().equalsIgnoreCase("mean time to restore")){
             records = smartDeviceInterface.getMTTRRecords(request);
             if(records == null)
@@ -112,6 +118,8 @@ public class SmartDeviceService extends DialogflowApp {
             }
 
         }
+
+        // requested stat is deployment frequency
         if(request.getStatRequested().equalsIgnoreCase("deployment frequency")){
             records = smartDeviceInterface.getDeploymentFrequencyRecords(request);
             if (records == null)
@@ -120,25 +128,37 @@ public class SmartDeviceService extends DialogflowApp {
                 int deploys = records.size();
                 Date current = new Date(System.currentTimeMillis());
                 final long[] timeMS = {current.getTime() - request.getStartDate().getTime()};
+                long totalTimeMS = current.getTime() - request.getStartDate().getTime();
+                // variables are named day and hour for readibility.
+                // however it is also possible that the most applicable units of time are hours and minutes.
                 String day = dateStringFormatter(timeMS);
                 String hour = dateStringFormatter(timeMS);
 
                 out = deploys + " deploy(s) " + " in" + day + hour + ".";
                 if(day.contains("day"))
-                    out += " Deployment Frequency is: " + df.format(deploys / timeMS[0]/(1000 * 60 * 60 * 24)) + " " + " deploys per day";
+                    out += " Deployment Frequency is: " + df.format((float)deploys /(float) (totalTimeMS/(1000 * 60 * 60 * 24))) + " deploys per day";
                 else if(day.contains("hour"))
-                    out += " Deployment Frequency is: " + df.format(deploys / timeMS[0]/(1000 * 60 * 60)) + " " + " deploys per day";
+                    out += " Deployment Frequency is: " + df.format((float)deploys / (float)(totalTimeMS/(1000 * 60 * 60))) + " deploys per hour";
+                // if the desired period of time is less than one hour, calculating deployment frequency specifically is unnecessary.
+                // in this case the value returned is simply the number of deployments and over however many minutes.
             }
         }
+
+        // requested statistic is change/fail percentage
         if(request.getStatRequested().equalsIgnoreCase("Change Fail Percentage")){
             records = smartDeviceInterface.getChangeFailPercentageRecords(request);
+
 
             //calculate and set to out
             if (records == null)
                 out = "Team Does Not Exist.";
+            else if(((Double)changeFail(records)).isNaN())
+                out = "No records found for this project or team.";
             else
                 out = "Change Fail Percentage = " + df.format(changeFail(records));
         }
+
+        // requested statistic is builds executed
         if(request.getStatRequested().equalsIgnoreCase("Builds Executed")){
             records = smartDeviceInterface.getBuildRecords(request);
             if (records == null)
@@ -148,6 +168,8 @@ public class SmartDeviceService extends DialogflowApp {
                 out = deploys + " build(s) since " + request.getStartDate().toString() + ".";
             }
         }
+
+        // requested statistic is total commits
         if(request.getStatRequested().equalsIgnoreCase("Commits")){
             records = smartDeviceInterface.getCommitRecords(request);
             if (records == null)
@@ -157,7 +179,6 @@ public class SmartDeviceService extends DialogflowApp {
                 out = commits + " commit(s) since " + request.getStartDate().toString() + ".";
             }
         }
-
 
         return out;
     }
@@ -335,39 +356,43 @@ public class SmartDeviceService extends DialogflowApp {
                 failed += (x - first - 1);
             }
         }
-
         return failed / (successCommits - repeats);
     }
 
     /**
-     * Date String Formatter
-     * for converting time in ms into a neatly formatted string
-     * @param timeMS a list containing one long representing the time in ms (passed by reference)
-     * timeMS is replaced by an int representing MS in next smallest unit of time, if applicable
-     * this allows for multiple sequential uses when multiple units are desired, ie. 3 hours 26 min
+     * for converting time in ms into a neatly formatted string. if used x times in a row on the same variable it
+     * provides x or less subsequent units of time, ie. 3 hours 26 min
+     * @param timeMS a list containing one long representing the time in ms. timeMS is replaced by a long representing
+     * MS in next smallest unit of time, if applicable
      * @return formatted date string
      */
     private String dateStringFormatter(long[] timeMS){
         String out = "";
-        // if largest complete unit is days, add days to string
+        // if largest complete unit is days, add that many days to string
         if(timeMS[0]/(1000 * 60 * 60 * 24) >= 1) {
             out = " " + out + timeMS[0] / (1000 * 60 * 60 * 24) + " day";
             if(timeMS[0]/(1000 * 60 * 60 * 24) > 1)
                 out += "s";
             timeMS[0] = timeMS[0] % (1000 * 60 * 60 * 24);
         }
-        // now hours
+        // if the largest complete unit of time is hours, adds that many hours to the string
         else if(timeMS[0]/(1000 * 60 * 60) >= 1) {
             out = " " + out + timeMS[0] / (1000 * 60 * 60) + " hour";
             if(timeMS[0]/(1000 * 60 * 60) > 1)
                 out += "s";
             timeMS[0] = timeMS[0] % (1000 * 60 * 60);
         }
-        // now minutes
+        // if the largest complete unit of time is minutes, adds that many minutes to the string
         else if (timeMS[0]/(1000 * 60) >= 1) {
             out = " " + out + (int) (timeMS[0] / (1000 * 60)) + " minute";
             if(timeMS[0]/(1000 * 60) > 1)
                 out += "s";
+            timeMS[0] = -1; // negative value ensures that number of minutes wont be added to the output twice
+        }
+        // if smallest unit of time is < 1 min but > 0 MS,
+        else if(timeMS[0]/(1000 * 60)<1 && timeMS[0]>=0){
+            out = out + " 0 minutes";
+            timeMS[0] = -1; // negative value ensures that number of minutes wont be added to the output twice
         }
         return out;
     }
