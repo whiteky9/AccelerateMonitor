@@ -31,7 +31,7 @@ public class GoogleController {
     }
 
     @PostMapping
-    public WebhookResponse getAccelerateStatWebhook(HttpServletRequest http_request, HttpServletResponse response) throws IOException, JSONException, ParseException {
+    public WebhookResponse getAccelerateStatWebhook(HttpServletRequest http_request, HttpServletResponse response) throws IOException, JSONException, ParseException, InterruptedException {
         String body = http_request.getReader().lines().collect(Collectors.joining());
         logger.info(new JSONObject(body).toString(4));
         Request request = new Request(body);
@@ -39,8 +39,8 @@ public class GoogleController {
     }
 
     @PostMapping("/accelerate")
-    public String getAccelerateRest(@RequestBody Request request) throws ParseException { return smartDeviceService.getAccelerateStatString(request); }
+    public String getAccelerateRest(@RequestBody Request request) throws ParseException, IOException, InterruptedException { return smartDeviceService.getAccelerateStatString(request); }
 
     @PostMapping("/display")
-    public List<Float> getAccelerateDisplay(@RequestBody Request request) throws ParseException { return smartDeviceService.getAccelerateStatList(request); }
+    public List<Float> getAccelerateDisplay(@RequestBody Request request) throws ParseException, IOException, InterruptedException { return smartDeviceService.getAccelerateStatList(request); }
 }

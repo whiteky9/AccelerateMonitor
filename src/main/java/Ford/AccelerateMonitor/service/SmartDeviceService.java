@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.google.actions.api.ActionResponse;
 import com.google.actions.api.response.ResponseBuilder;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,7 +34,7 @@ public class SmartDeviceService extends DialogflowApp {
     public SmartDeviceService(@Qualifier("SmartDeviceDataAccess") SmartDeviceInterface smartDeviceInterface){ this.smartDeviceInterface = smartDeviceInterface; }
     //TODO review calculation methods
 
-    public String getAccelerateStatString(Request request) throws ParseException {
+    public String getAccelerateStatString(Request request) throws ParseException, IOException, InterruptedException {
         List<Record> records;
         Map<Commit,Build> leadTimeRecords;
         String out = "Stat not recognized";
@@ -153,7 +154,7 @@ public class SmartDeviceService extends DialogflowApp {
         return out;
     }
 
-    public List<Float> getAccelerateStatList(Request request) throws ParseException {
+    public List<Float> getAccelerateStatList(Request request) throws ParseException, IOException, InterruptedException {
         List<Float> ints = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(request.getStartDate());
@@ -205,7 +206,7 @@ public class SmartDeviceService extends DialogflowApp {
         return ints;
     }
 
-    public WebhookResponse getAccelerateStatWebhook(Request request) throws ParseException {
+    public WebhookResponse getAccelerateStatWebhook(Request request) throws ParseException, IOException, InterruptedException {
         String out = getAccelerateStatString(request);
 
         ResponseBuilder responseBuilder = new ResponseBuilder().add(out);

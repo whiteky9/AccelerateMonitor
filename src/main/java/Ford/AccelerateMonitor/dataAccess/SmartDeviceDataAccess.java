@@ -2,6 +2,7 @@ package Ford.AccelerateMonitor.dataAccess;
 
 import Ford.AccelerateMonitor.model.*;
 import Ford.AccelerateMonitor.model.Record;
+import Ford.AccelerateMonitor.product.Github;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -32,7 +33,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
     }
 
     @Override
-    public Map<Commit,Build> getLeadTimeRecords(Request request) {
+    public Map<Commit,Build> getLeadTimeRecords(Request request) throws InterruptedException, ParseException, IOException {
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         Map<Commit,Build> records = new HashMap<>();
         if(request.getTargetProject() != null){
@@ -161,7 +162,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
     }
 
     @Override
-    public List<Record> getCommitRecords(Request request){
+    public List<Record> getCommitRecords(Request request) throws InterruptedException, ParseException, IOException {
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         List<Record> records = new ArrayList<>();
         // query by project
@@ -191,12 +192,36 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
     // helper functions
     //
     // Gets list of incident records
-    private Map<Commit,Build> getLeadTimeRecordsByProject(Map<Commit,Build> records, Request request, FirebaseDatabase DB){
+    private Map<Commit,Build> getLeadTimeRecordsByProject(Map<Commit,Build> records, Request request, FirebaseDatabase DB) throws InterruptedException, ParseException, IOException {
         DatabaseReference commitsRef = DB.getReference("records/commits");
         DatabaseReference buildsRef = DB.getReference("records/builds");
-        final Boolean[] complete = {false};
+        DatabaseReference githubRef = DB.getReference("products/github");
+        final Boolean[] complete = {false, false, false};
+        List<Github> repositories = new ArrayList<>();
         Date requestDate = request.getStartDate();
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+        // adds new commits
+        githubRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()) {
+                    Github github = child.getValue(Github.class);
+                    if(request.getTargetProject().equals(github.getProjectName()))
+                        repositories.add(github);
+                }
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]) {}
+        for(int i=0; i<repositories.size(); i++){
+            repositories.get(i).obtainAllCommitData();
+        }
+
         // find relevant commit records
         commitsRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -213,7 +238,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                         records.put(record, null);
                     }
                 }
-                complete[0] = true;
+                complete[1] = true;
             }
 
             @Override
@@ -221,8 +246,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
 
             }
         });
-        while(!complete[0]){}
-        complete[0] = false;
+        while(!complete[1]){}
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
         Map<String, Build> builds = new HashMap<>();
         // find relevant build records
@@ -260,7 +284,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                         }
                     }
                 }
-                complete[0] = true;
+                complete[2] = true;
             }
 
             @Override
@@ -268,7 +292,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
 
             }
         });
-        while(!complete[0]){}
+        while(!complete[2]){}
 
         return records;
     }
@@ -404,11 +428,35 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
     }
 
     //
-    List<Record> getCommitRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
+    List<Record> getCommitRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB) throws InterruptedException, ParseException, IOException {
         DatabaseReference commitsRef = DB.getReference("records/commits");
+        DatabaseReference githubRef = DB.getReference("products/github");
+        List<Github> repositories = new ArrayList<>();
         Date requestDate = request.getStartDate();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
-        final Boolean[] complete = {false};
+        final Boolean[] complete = {false,false};
+        // adds new commit records
+        githubRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()) {
+                    Github github = child.getValue(Github.class);
+                    if(request.getTargetProject().equals(github.getProjectName()))
+                        repositories.add(github);
+                }
+                complete[0] = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        while(!complete[0]) {}
+        for(int i=0; i<repositories.size(); i++){
+            repositories.get(i).obtainAllCommitData();
+        }
+        // gets commits
         commitsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -424,7 +472,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                         records.add(record);
                     }
                 }
-                complete[0] = true;
+                complete[1] = true;
             }
 
             @Override
@@ -432,7 +480,7 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
 
             }
         });
-        while(!complete[0]){}
+        while(!complete[1]){}
         return records;
     }
 
