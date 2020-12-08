@@ -37,6 +37,11 @@ public class SmartDeviceService extends DialogflowApp {
 
     public SmartDeviceService(@Qualifier("SmartDeviceDataAccess") SmartDeviceInterface smartDeviceInterface){ this.smartDeviceInterface = smartDeviceInterface; }
 
+    /**
+     * given a single accelerate stat request, returns a response in string form
+     * @param request google assistant request
+     * @return a string to me returned to google, formatted to be comprehensible when spoken  by google assistant
+     */
     public String getAccelerateStatString(Request request) throws ParseException, IOException, InterruptedException {
         List<Record> records;
         Map<Commit,Build> leadTimeRecords;
@@ -157,6 +162,11 @@ public class SmartDeviceService extends DialogflowApp {
         return out;
     }
 
+    /**
+     * intended for displaying stats on the web portal.
+     * @param request google assistant request
+     * @return a list of floats
+     */
     public List<Float> getAccelerateStatList(Request request) throws ParseException, IOException, InterruptedException {
         List<Float> ints = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
@@ -216,11 +226,14 @@ public class SmartDeviceService extends DialogflowApp {
         return response.getWebhookResponse();
     }
 
+    /**
+     * Statistic calculations helper functions
+     */
 
     /**
-     * Statistic calculations
-     *
-     *
+     * calculates lead time
+     * @param leadTimeRecords
+     * @return long representing lead time of the records provided
      */
     private long leadTime(Map<Commit,Build> leadTimeRecords) throws ParseException {
         SimpleDateFormat buildSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
@@ -241,6 +254,11 @@ public class SmartDeviceService extends DialogflowApp {
         return (long) (totalLeadTime / c);
     }
 
+    /**
+     * calculates mean time to restore
+     * @param records list of records with which to perform calculations
+     * @return float representing mean time to restore of the records provided
+     */
     private float mttr(List<Record> records){
         // Match up records into pairs
         int pairCount = 0;
@@ -286,6 +304,11 @@ public class SmartDeviceService extends DialogflowApp {
         return mttr;
     }
 
+    /**
+     * calculates change/fail percentage
+     * @param records
+     * @return double representing change/fail percentage of the records provided
+     */
     private double changeFail(List<Record> records) {
 
         double successCommits = 0;
@@ -315,20 +338,17 @@ public class SmartDeviceService extends DialogflowApp {
 
         return failed / (successCommits - repeats);
     }
+
     /**
-     *
      * Date String Formatter
      * for converting time in ms into a neatly formatted string
-     *
      * @param timeMS a list containing one long representing the time in ms (passed by reference)
      * timeMS is replaced by an int representing MS in next smallest unit of time, if applicable
      * this allows for multiple sequential uses when multiple units are desired, ie. 3 hours 26 min
-     *
-     * returns formatted date string
+     * @return formatted date string
      */
     private String dateStringFormatter(long[] timeMS){
         String out = "";
-
         // if largest complete unit is days, add days to string
         if(timeMS[0]/(1000 * 60 * 60 * 24) >= 1) {
             out = " " + out + timeMS[0] / (1000 * 60 * 60 * 24) + " day";
@@ -352,19 +372,3 @@ public class SmartDeviceService extends DialogflowApp {
         return out;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
