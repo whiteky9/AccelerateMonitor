@@ -44,10 +44,6 @@ public class RecordsDataAccess implements RecordsInterface {
             String key = sdf.parse(record.getDate()).getTime()+":"+record.getProjectName();
             newBuild.put(key, record);
             buildsRef.updateChildrenAsync(newBuild);
-
-            if(record.getStatus().equals("FAILURE")){
-                // TODO send build failure notification
-            }
         }
         else if(record.getClass() == (new IncidentRecord()).getClass()){
             DatabaseReference incidentsRef = recordsRef.child("incidents/");
