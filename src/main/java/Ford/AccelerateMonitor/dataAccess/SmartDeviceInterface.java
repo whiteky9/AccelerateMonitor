@@ -10,7 +10,11 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-// Interface to allow easy implementation of additional data sources.
+/**
+ * Interface to allow easy implementation of additional data sources.
+ * in order to use a different database, create a corresponding data access class
+ * which inheirits from this interface
+ */
 public interface SmartDeviceInterface {
     Map<Commit,Build> getLeadTimeRecords(Request request) throws InterruptedException, ParseException, IOException;
     List<Record> getMTTRRecords(Request request);

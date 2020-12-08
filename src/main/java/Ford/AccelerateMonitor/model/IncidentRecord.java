@@ -1,5 +1,8 @@
 package Ford.AccelerateMonitor.model;
 
+/**
+ * Used to store information on service failure
+ */
 public class IncidentRecord extends Record{
 
     public IncidentRecord(String projectName,String date, String status){

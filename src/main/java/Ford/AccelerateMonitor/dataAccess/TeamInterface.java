@@ -4,6 +4,11 @@ import Ford.AccelerateMonitor.model.Team;
 
 import java.util.List;
 
+/**
+ * Interface to allow easy implementation of additional data sources.
+ * in order to use a different database, create a corresponding data access class
+ * which inheirits from this interface
+ */
 public interface TeamInterface {
     void insertTeam(Team team);
     List<Team> getAllTeams();

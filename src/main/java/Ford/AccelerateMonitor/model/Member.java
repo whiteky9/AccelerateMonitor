@@ -3,6 +3,11 @@ package Ford.AccelerateMonitor.model;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Used to store information from a member
+ * firebase auth currently stores password
+ * to handle authentication some other way, password comments can be utilized to handle securely storing passwords
+ */
 public class Member {
 
     public Member(){

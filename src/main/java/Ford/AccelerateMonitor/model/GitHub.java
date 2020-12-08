@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Used to parse information from
+ */
 public class GitHub {
     private String node_id;
     private String sha;

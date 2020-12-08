@@ -148,7 +148,6 @@ public class FirebaseProductDataAccess implements ProductInterface{
             deleteGithub.put(keys.get(i), null);
         }
         githubRef.updateChildrenAsync(deleteGithub);
-
         // jenkins
         DatabaseReference jenkinsRef = DB.getReference("products/jenkins");
         Map<String, Object> deleteJenkins = new HashMap<>();

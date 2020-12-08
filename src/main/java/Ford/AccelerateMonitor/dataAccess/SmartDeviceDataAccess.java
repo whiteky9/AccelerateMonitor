@@ -16,6 +16,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * accesses database to obtain records to satisfy smart home and web portal requests
+ */
 @Repository("SmartDeviceDataAccess")
 public class SmartDeviceDataAccess implements SmartDeviceInterface{
 
@@ -32,6 +35,11 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         this.app = FirebaseApp.initializeApp(options, "FirebaseSmartDeviceDatabase");
     }
 
+    /**
+     *
+     * @param request smart home request
+     * @return map containing commit records and corresponding jenkins build records
+     */
     @Override
     public Map<Commit,Build> getLeadTimeRecords(Request request) throws InterruptedException, ParseException, IOException {
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
@@ -51,11 +59,15 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
                 }
             }
             request.setTargetProject(null);
-
         }
         return records;
     }
 
+    /**
+     *
+     * @param request smart home request
+     * @return list containing incident records
+     */
     @Override
     public List<Record> getMTTRRecords(Request request){
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
@@ -80,6 +92,11 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         return records;
     }
 
+    /**
+     *
+     * @param request smart home request
+     * @return list containing build records
+     */
     @Override
     public List<Record> getDeploymentFrequencyRecords(Request request){
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
@@ -101,12 +118,14 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
             }
             request.setTargetProject(null);
         }
-        else{
-            // error
-        }
         return records;
     }
 
+    /**
+     *
+     * @param request smart home request
+     * @return list containing build records
+     */
     @Override
     public List<Record> getChangeFailPercentageRecords(Request request){
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
@@ -128,12 +147,14 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
             }
             request.setTargetProject(null);
         }
-        else{
-            // error
-        }
         return records;
     }
 
+    /**
+     *
+     * @param request smart home request
+     * @return list containing build records
+     */
     @Override
     public List<Record> getBuildRecords(Request request){
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
@@ -155,12 +176,14 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
             }
             request.setTargetProject(null);
         }
-        else{
-            // error
-        }
         return records;
     }
 
+    /**
+     *
+     * @param request smart home request
+     * @return list containing commit records
+     */
     @Override
     public List<Record> getCommitRecords(Request request) throws InterruptedException, ParseException, IOException {
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
@@ -182,16 +205,17 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
             }
             request.setTargetProject(null);
         }
-        else{
-            // error
-        }
         return records;
     }
 
-    //
-    // helper functions
-    //
-    // Gets list of incident records
+    /**
+     * helper functions
+     *
+     */
+
+    /**
+     * Gets records for calculating lead time when provided with a project
+     */
     private Map<Commit,Build> getLeadTimeRecordsByProject(Map<Commit,Build> records, Request request, FirebaseDatabase DB) throws InterruptedException, ParseException, IOException {
         DatabaseReference commitsRef = DB.getReference("records/commits");
         DatabaseReference buildsRef = DB.getReference("records/builds");
@@ -297,6 +321,9 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         return records;
     }
 
+    /**
+     * Gets records for calculating mean time to restore when provided with a project
+     */
     private List<Record> getMTTRRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
         DatabaseReference incidentsRef = DB.getReference("records/incidents");
         Date requestDate = request.getStartDate();
@@ -328,7 +355,9 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         return records;
     }
 
-    // Gets list of Deployment records
+    /**
+     * Gets records for calculating deployment frequency when provided with a project
+     */
     private List<Record> getDFRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
         DatabaseReference buildsRef = DB.getReference("records/builds");
         Date requestDate = request.getStartDate();
@@ -361,7 +390,9 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         return records;
     }
 
-    // Gets Change Fail records and puts them into list passed in
+    /**
+     * Gets records for calculating change fail percentage when provided with a project
+     */
     private List<Record> getCFRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
         DatabaseReference buildsRef = DB.getReference("records/builds");
         Date requestDate = request.getStartDate();
@@ -394,7 +425,9 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         return records;
     }
 
-    //
+    /**
+     * Gets list of all builds on a project
+     */
     List<Record> getBuildRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB){
         DatabaseReference buildsRef = DB.getReference("records/builds");
         Date requestDate = request.getStartDate();
@@ -427,7 +460,9 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         return records;
     }
 
-    //
+    /**
+     * Gets list of all commits for a project
+     */
     List<Record> getCommitRecordsByProject(List<Record> records, Request request, FirebaseDatabase DB) throws InterruptedException, ParseException, IOException {
         DatabaseReference commitsRef = DB.getReference("records/commits");
         DatabaseReference githubRef = DB.getReference("products/github");
@@ -484,7 +519,9 @@ public class SmartDeviceDataAccess implements SmartDeviceInterface{
         return records;
     }
 
-    // if the team name is requested, this function uses this name to obtain relevant projects
+    /**
+     * returns a list of project names associated with a certain team
+     */
     private List<String> getProjectNamesByTeamName(Request request, FirebaseDatabase DB){
         final Team[] teams = {null};
         final Boolean[] complete = {false};

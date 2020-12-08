@@ -60,9 +60,6 @@ public class RecordsDataAccess implements RecordsInterface {
             newCommit.put(key, record);
             commitsRef.updateChildrenAsync(newCommit);
         }
-        else {
-            //error
-        }
     }
 
     public void deleteRecords(String name){
@@ -92,7 +89,6 @@ public class RecordsDataAccess implements RecordsInterface {
             deleteBuilds.put(keys.get(i), null);
         }
         buildsRef.updateChildrenAsync(deleteBuilds);
-
 
         // commits
         DatabaseReference commitsRef = DB.getReference("records/commits");
@@ -151,8 +147,6 @@ public class RecordsDataAccess implements RecordsInterface {
         }
         incidentsRef.updateChildrenAsync(deleteIncidents);
     }
-
-
 
     final private FirebaseApp app;
 }

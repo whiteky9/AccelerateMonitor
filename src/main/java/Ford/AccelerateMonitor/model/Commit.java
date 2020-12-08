@@ -1,5 +1,8 @@
 package Ford.AccelerateMonitor.model;
 
+/**
+ * Used to store information from a jenkins build
+ */
 public class Commit extends Record{
 
     public Commit(String date, String projectName, String user, String sha){

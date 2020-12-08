@@ -23,16 +23,19 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-
+/**
+ * service class which performs calculations to determine accelerate statistics using records obtained from
+ * smartDeviceDataAccess
+ */
 @Service
 public class SmartDeviceService extends DialogflowApp {
+
     static Integer[] DAYSINMONTHS = new Integer[]{31,29,31,30,31,30,31,31,30,31,30,31};
 
     private final SmartDeviceInterface smartDeviceInterface;
     private org.slf4j.Logger logger = LoggerFactory.getLogger(GoogleController.class);
 
     public SmartDeviceService(@Qualifier("SmartDeviceDataAccess") SmartDeviceInterface smartDeviceInterface){ this.smartDeviceInterface = smartDeviceInterface; }
-    //TODO review calculation methods
 
     public String getAccelerateStatString(Request request) throws ParseException, IOException, InterruptedException {
         List<Record> records;
@@ -176,7 +179,6 @@ public class SmartDeviceService extends DialogflowApp {
 
             }
         }
-
 
         else if(request.getStatRequested().equals("Mean Time To Restore") ||  request.getStatRequested().equals("Change Fail Percentage" ) || request.getStatRequested().equals("Lead Time")) {
             request.setStartDate(String.format("%02d",month+1) + " " + String.format("%02d",day) + " " + year);

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
 @Service
 public class MemberService {
 
@@ -20,9 +19,7 @@ public class MemberService {
 
     public void addMember(Member member){ memberInterface.insertMember(member); }
 
-    public List<Member> getAllMembers(){
-        return memberInterface.getAllMembers();
-    }
+    public List<Member> getAllMembers(){ return memberInterface.getAllMembers(); }
 
     public Member getMember(String id) { return memberInterface.getMember(id); }
 
@@ -35,5 +32,4 @@ public class MemberService {
     public void addTeam(String id, String team){ memberInterface.addTeam(id, team); }
 
     public void removeTeam(String id, String team){ memberInterface.removeTeam(id, team); }
-
 }

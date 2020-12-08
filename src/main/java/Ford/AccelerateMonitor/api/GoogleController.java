@@ -30,6 +30,7 @@ public class GoogleController {
         this.smartDeviceService = smartDeviceService;
     }
 
+    // endpoint for google assistant
     @PostMapping
     public WebhookResponse getAccelerateStatWebhook(HttpServletRequest http_request, HttpServletResponse response) throws IOException, JSONException, ParseException, InterruptedException {
         String body = http_request.getReader().lines().collect(Collectors.joining());
@@ -38,9 +39,11 @@ public class GoogleController {
         return smartDeviceService.getAccelerateStatWebhook(request);
     }
 
+    // endpoint useable for miscelaneous other http requests
     @PostMapping("/accelerate")
     public String getAccelerateRest(@RequestBody Request request) throws ParseException, IOException, InterruptedException { return smartDeviceService.getAccelerateStatString(request); }
 
+    // endpoint for displaying on web portal
     @PostMapping("/display")
     public List<Float> getAccelerateDisplay(@RequestBody Request request) throws ParseException, IOException, InterruptedException { return smartDeviceService.getAccelerateStatList(request); }
 }

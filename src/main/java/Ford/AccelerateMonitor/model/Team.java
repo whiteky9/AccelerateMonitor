@@ -3,6 +3,9 @@ package Ford.AccelerateMonitor.model;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Used to store information of registered teams
+ */
 public class Team {
     public Team(){
         this.name = null;

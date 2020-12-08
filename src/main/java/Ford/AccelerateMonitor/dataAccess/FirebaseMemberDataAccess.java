@@ -31,17 +31,16 @@ public class FirebaseMemberDataAccess implements MemberInterface {
         this.app = FirebaseApp.initializeApp(options, "FirebaseMemberDatabase");
     }
 
-    //
-    // adds a member into the database
-    //
+    /**
+     * adds a member into the database
+     * @param member
+     */
     @Override
     public void insertMember(Member member){
         //creates reference to member list in database
-
         FirebaseDatabase DB = FirebaseDatabase.getInstance(app);
         DatabaseReference dataRef = DB.getReference();
         DatabaseReference membersRef = dataRef.child("members");
-
 
         //pushes provided member into the database
         Map<String, Object> newMember = new HashMap<>();
@@ -49,9 +48,10 @@ public class FirebaseMemberDataAccess implements MemberInterface {
 		membersRef.updateChildrenAsync(newMember);
     }
 
-    //
-    // gets a list of all members from the database
-    //
+    /**
+     * gets a list of all members from the database
+     * @return
+     */
     @Override
     public List<Member> getAllMembers(){
         //creates reference to member list in database
@@ -80,9 +80,10 @@ public class FirebaseMemberDataAccess implements MemberInterface {
         while(!complete[0]){}
         return members;
     }
-    //
-    // gets member by id
-    //
+
+    /**
+     * gets member by id
+     */
     @Override
     public Member getMember(String id){
         //creates reference to member list in database
@@ -122,9 +123,9 @@ public class FirebaseMemberDataAccess implements MemberInterface {
         return members.get(0);
     }
 
-    //
-    // gets member by email
-    //
+    /**
+     * gets member by email
+     */
     @Override
     public Member getByEmail(String email){
         //creates reference to member list in database
@@ -164,9 +165,9 @@ public class FirebaseMemberDataAccess implements MemberInterface {
         return members.get(0);
     }
 
-    //
-    // removes member from database
-    //
+    /**
+     * removes member from database
+     */
     @Override
     public void deleteMember(String id){
         //creates reference to member list in database

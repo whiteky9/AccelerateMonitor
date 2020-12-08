@@ -8,6 +8,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Used to store information from a google assistant request
+ */
 public class Request {
 
     public Request(String statRequested, String targetTeam, String targetProject, String startDate,String endDate) throws ParseException {

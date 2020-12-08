@@ -2,6 +2,9 @@ package Ford.AccelerateMonitor.model;
 
 import java.util.UUID;
 
+/**
+ * Used to store information from registered projects
+ */
 public class Project {
     public Project(){
         this.name = null;

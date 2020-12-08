@@ -1,14 +1,8 @@
 package Ford.AccelerateMonitor.model;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.*;
-
-/*
-@JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = IncidentRecord.class, name = "Incident")
-})*/
+/**
+ * abstract record class
+ */
 public abstract class Record {
 
     public Record(String projectName,String date) {
@@ -36,20 +30,7 @@ public abstract class Record {
     public String getSha() {return null;};
 
     public String getCommitID() {return null;};
-/*
-    public abstract String getCommitID();
-    public abstract void setCommitID(String commitID);
-    public abstract Boolean getDeployment();
-    public abstract void setDeployment(Boolean deployment) ;
-    public abstract String getStatus() ;
-    public abstract void setStatus(String status) ;
-    public abstract String getEnv();
-    public abstract void setEnv(String env);
 
-    public String getType();
-    public void setType(String type) ;
-*/
     private String date;
     private String projectName;
-    //private String type;
 }

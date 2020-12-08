@@ -62,13 +62,11 @@ public class FirebaseTeamDataAccess implements TeamInterface{
                 complete[0] = true;
             }
 
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
-
         //waits for listeners to update teams
         while(!complete[0]){}
         return teams;

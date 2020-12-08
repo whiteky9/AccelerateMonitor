@@ -60,13 +60,11 @@ public class FirebaseProjectDataAccess implements ProjectInterface{
                 complete[0] = true;
             }
 
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
         });
-
         //waits for listeners to update projects
         while(!complete[0]){}
         return projects;
@@ -227,7 +225,6 @@ public class FirebaseProjectDataAccess implements ProjectInterface{
 
             }
         });
-        //
         while(!complete[0]){}
         updateUserById.put(keys.get(0), project);
         projectsRef.setValueAsync(updateUserById);
