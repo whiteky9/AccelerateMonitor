@@ -21,11 +21,11 @@ public class FirebaseProjectDataAccess implements ProjectInterface{
     public FirebaseProjectDataAccess() throws IOException {
         //creates connection to database
         FileInputStream serviceAccount =
-                new FileInputStream("cse498-capstone-firebase-adminsdk-4g11i-67fbf0b50a.json");
+                new FileInputStream("cse498-capstone-firebase-adminsdk-4g11i-67fbf0b50a.json"); // replace this with the filename for the service key
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .setDatabaseUrl("https://cse498-capstone.firebaseio.com")
+                .setDatabaseUrl("https://cse498-capstone.firebaseio.com") // replace this with firebase url
                 .build();
         //instantiates firebase app
         this.app = FirebaseApp.initializeApp(options, "FirebaseProjectDatabase");
